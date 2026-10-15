@@ -42,6 +42,32 @@ The app repo's `site-refresh.yml` workflow calls a Vercel deploy hook whenever a
 1. In Vercel, open the project → **Settings → Git → Deploy Hooks**, create a hook for the `main` branch and copy its URL.
 2. In the app repo on GitHub, open **Settings → Secrets and variables → Actions** and add a secret named `VERCEL_DEPLOY_HOOK` with that URL.
 
+## Trial and licences
+
+The app's free trial and licence keys are passes signed with an Ed25519 key. The app checks them offline with the matching public key, in `src-tauri/src/licence/token.rs` in the app repo.
+
+| Endpoint | Does |
+|---|---|
+| `POST /api/trial` | Registers a computer's trial the first time it's online, by an anonymous ID the app makes, and signs its dates. A reinstall on the same computer gets the dates first registered. |
+| `GET /api/time?nonce=…` | The website's clock, signed, so the app can tell a wrong date from one turned back. |
+
+What they need on Vercel:
+
+- **`LICENCE_SIGNING_KEY`**: the private key (PKCS#8 PEM), as a sensitive environment variable. The original is in `~/.hearken/licence-signing-key.pem` on the computer that created it. **Back it up in a password manager.** If it's lost, keys can't be issued for the apps already installed. If it leaks, anyone can make licence keys.
+- **Upstash Redis** from the Storage tab (it sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`), to remember each computer's trial. Without it, `/api/trial` answers 503 and the app keeps its offline trial.
+
+### Issuing a licence by hand
+
+Until payments issue keys automatically:
+
+```bash
+npm run licence -- --church "Grace Chapel" --months 12
+```
+
+This prints the key to email to the church and records it in `~/.hearken/licences.jsonl`.
+
+`npm test` runs the endpoint tests.
+
 ## Deploying
 
 The site deploys from `main` on Vercel. The settings are in `vercel.json`: build with `node build.mjs`, serve `dist/`, and use clean URLs (`/blog` rather than `/blog.html`).
