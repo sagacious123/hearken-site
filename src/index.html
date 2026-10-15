@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hearken Studio · Say the verse. See the verse.</title>
+<meta name="description" content="Hearken Studio listens to the sermon and puts every verse on the screen as it's spoken. Free and offline for Mac, Windows and Linux.">
+<meta property="og:title" content="Hearken Studio · Say the verse. See the verse.">
+<meta property="og:description" content="Live scripture detection for churches. Free and offline for Mac, Windows and Linux.">
+<meta property="og:type" content="website">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@200;300;400;500;600;700;800&display=swap">
+<style>
+/* Layout: the product told through the Bible's story. Two scenes hold the screen while they play
+   (the first light, the parting sea); the rest scroll freely and reveal as they arrive. */
+:root {
+  color-scheme: dark;
+  --ink: #f4ede1; --soft: #cbc1b0; --dim: #8c8373;
+  --gold: #e9b24c; --gold-pale: #f8e0a4; --ember: #ff7b3a; --sea: #59cfe0;
+  --card: rgba(255,255,255,.04); --card-line: rgba(255,255,255,.09);
+  --epic: "Cinzel", "Trajan Pro", "Times New Roman", serif;
+  --scripture: "EB Garamond", Garamond, Georgia, serif;
+  --ui: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+body { margin: 0; background: #050409; color: var(--ink); font: 400 15px/1.6 var(--ui); transition: background-color 1.4s ease; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+h1, h2, h3, p { margin: 0; }
+#sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+.top { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 14px); left: 50%; transform: translateX(-50%); width: min(1360px, calc(100% - 28px)); z-index: 40; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; padding: 14px 14px 14px 26px; border-radius: 14px;
+  background: rgba(20,16,30,.42); backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid rgba(255,255,255,.1); box-shadow: 0 10px 40px -12px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.06); }
+.top .right { display: flex; justify-content: flex-end; gap: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 600 18px/1 var(--epic); letter-spacing: .14em; }
+.brand svg { width: 26px; height: 26px; }
+.top .links { display: flex; gap: 32px; font: 200 14px/1 var(--ui); color: var(--soft); }
+.top .links a { text-decoration: none; }
+.top .links a:hover { color: var(--ink); }
+.top .go { text-decoration: none; font: 700 14px/1 var(--ui); padding: 11px 16px; border-radius: 7px; color: #1d1200; background: var(--gold); white-space: nowrap; }
+.top .go:hover { background: var(--gold-pale); }
+@media (max-width: 860px) { .top { grid-template-columns: 1fr auto; } .top .links { display: none; } }
+
+.wrap { width: min(1180px, 100%); margin: 0 auto; padding-inline: clamp(16px, 5vw, 48px); }
+.eyebrow { font: 600 12px/1 var(--epic); letter-spacing: .3em; text-transform: uppercase; color: var(--gold); }
+.h2 { font: 400 clamp(36px, 5vw, 66px)/1.06 var(--epic); letter-spacing: .015em; text-wrap: balance; }
+.lede { font-size: 16px; font-weight: 200; color: var(--soft); max-width: 36em; }
+.lede b { color: var(--ink); font-weight: 600; }
+.btn { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font: 700 15px/1 var(--ui); padding: 15px 22px; border-radius: 8px; border: 1px solid var(--gold); color: #1d1200; background: var(--gold); white-space: nowrap; cursor: pointer; transition: background .2s, border-color .2s; }
+.btn:hover { background: var(--gold-pale); border-color: var(--gold-pale); }
+.btn.ghost { background: rgba(5,4,9,.4); color: var(--ink); border-color: rgba(244,237,225,.32); }
+.btn.ghost:hover { border-color: var(--ink); background: rgba(5,4,9,.6); }
+
+/* reveal as sections arrive (from a visible resting state) */
+.rv { transition: opacity .9s ease, transform 1s cubic-bezier(.2,.8,.2,1), filter .9s ease; }
+.js .rv:not(.in) { opacity: .2; transform: translateY(26px); filter: blur(3px); }
+.rv.d1 { transition-delay: .1s; } .rv.d2 { transition-delay: .2s; } .rv.d3 { transition-delay: .3s; }
+
+section.flow { position: relative; z-index: 1; padding-block: clamp(90px, 13vw, 170px); }
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
+@media (max-width: 900px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.stack { display: grid; gap: 20px; align-content: start; }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 44px; }
+.card { border-radius: 18px; padding: 24px; background: var(--card); border: 1px solid var(--card-line); display: grid; gap: 10px; align-content: start; backdrop-filter: blur(4px); }
+.card h3 { font: 700 18px/1.3 var(--ui); }
+.card p { color: var(--soft); font-size: 15px; }
+.card .k { font: 600 11px/1 var(--epic); letter-spacing: .2em; color: var(--gold); }
+@media (max-width: 900px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+
+/* I. Let there be light (pinned): Journey I's opening */
+.scene { position: relative; z-index: 1; }
+.scene .stage { position: sticky; top: 0; height: 100vh; height: 100dvh; display: grid; align-items: center; overflow: hidden; padding: 90px clamp(16px, 6vw, 96px) 60px; }
+#light { height: 260vh; }
+#light .inner { position: relative; width: min(1180px, 100%); margin: 0 auto; display: grid; gap: clamp(24px, 4vw, 56px); justify-items: center; text-align: center; }
+.chapter { font: 600 12px/1 var(--epic); letter-spacing: .32em; text-transform: uppercase; color: var(--gold); text-shadow: 0 1px 12px rgba(5,4,9,.9); }
+.verse { font: italic 400 clamp(20px, 2.4vw, 30px)/1.45 var(--scripture); color: var(--soft); max-width: 30em; text-wrap: pretty; }
+.verse cite { display: block; margin-top: 12px; font: 600 12px/1 var(--epic); font-style: normal; letter-spacing: .24em; color: var(--dim); }
+.verse .w { opacity: .14; transition: opacity .5s ease, color .5s; }
+.verse .w.on { opacity: 1; color: var(--ink); }
+.step { opacity: .12; transform: translateY(18px); filter: blur(4px); transition: opacity .8s ease, transform .9s cubic-bezier(.2,.8,.2,1), filter .8s ease; }
+.step.on { opacity: 1; transform: none; filter: none; }
+.cue { display: inline-flex; align-items: center; gap: 10px; font: 600 12px/1 var(--epic); letter-spacing: .24em; color: var(--dim); }
+.cue::after { content: ""; width: 1px; height: 34px; background: linear-gradient(var(--gold), transparent); animation: drip 2s ease-in-out infinite; }
+@keyframes drip { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+#light .dark { font: 400 clamp(30px, 4.6vw, 62px)/1.1 var(--epic); color: var(--dim); letter-spacing: .04em; transition: opacity 1s, filter 1s; }
+#light.lit .dark { opacity: 0; filter: blur(8px); position: absolute; }
+#light .reveal { display: grid; justify-items: center; gap: 22px; }
+#light .reveal h1 { font: 400 clamp(42px, 6.6vw, 96px)/1.02 var(--epic); letter-spacing: .03em; color: #fffaf0; text-shadow: 0 0 60px rgba(248,224,164,.55); text-wrap: balance; }
+#light .reveal .tag { font: italic 400 clamp(21px, 2.4vw, 30px)/1.4 var(--scripture); color: var(--ink); max-width: 26em; text-shadow: 0 1px 18px rgba(5,4,9,.9); }
+#light .ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px; }
+.ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+
+/* II. the voice in the fire */
+.feed { border-radius: 18px; padding: 22px; background: rgba(22,8,4,.75); border: 1px solid rgba(255,123,58,.28); box-shadow: 0 30px 90px -30px rgba(255,123,58,.5); display: grid; gap: 12px; }
+.feed .lbl { display: flex; align-items: center; gap: 8px; font: 700 11px/1 var(--ui); letter-spacing: .16em; text-transform: uppercase; color: #ffb27e; }
+.feed .lbl::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ember); box-shadow: 0 0 12px var(--ember); animation: beat 1.4s infinite; }
+@keyframes beat { 50% { opacity: .35; } }
+.feed .ln { color: var(--soft); font-size: 15px; }
+.feed .ln time { font: 600 12px/1 var(--ui); color: var(--dim); margin-right: 10px; }
+.feed .ln .ok { color: #ffb27e; font-size: 12px; margin-left: 6px; }
+.feed mark { background: none; color: #ffd2a8; text-shadow: 0 0 16px rgba(255,123,58,.9); }
+.feed .meter { display: flex; align-items: end; gap: 3px; height: 30px; }
+.feed .meter i { flex: 1; border-radius: 2px; background: linear-gradient(#ffb27e, var(--ember)); animation: lvl 1.1s ease-in-out infinite alternate; }
+@keyframes lvl { from { height: 20%; } to { height: 95%; } }
+
+/* III. the parting sea (pinned) */
+#sea { height: 230vh; }
+#sea .stage { padding: 0; }
+#seaBed { position: absolute; inset: 0; width: 100%; height: 100%; }
+.wallc { position: absolute; top: 0; height: 100%; width: 58%; will-change: transform; transition: transform .2s linear; }
+#wallL { left: 0; transform: translateX(calc(var(--open, 0) * -72%)); }
+#wallR { right: 0; transform: translateX(calc(var(--open, 0) * 72%)); }
+#sea .shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(rgba(2,10,16,.78), rgba(2,10,16,.12) 40%, rgba(2,10,16,0) 78%, rgba(2,10,16,.55)); }
+#sea .over { position: relative; z-index: 2; width: min(1180px, 100%); margin: 0 auto; padding: 96px clamp(16px, 5vw, 48px) 40px; display: grid; justify-items: center; text-align: center; gap: 18px; height: 100%; align-content: start; }
+#sea .over .h2, #sea .over .lede { text-shadow: 0 2px 20px rgba(0,10,16,.95); }
+.desk { margin-top: 8px; width: min(820px, 100%); border-radius: 16px; overflow: hidden; background: rgba(6,16,22,.92); border: 1px solid rgba(89,207,224,.3); box-shadow: 0 30px 90px -20px rgba(0,0,0,.8), 0 0 70px -20px rgba(89,207,224,.5); text-align: left; transition: opacity .6s ease, transform .8s ease; opacity: calc(var(--open, 0) * 1.4 - .3); transform: translateY(calc((1 - var(--open, 0)) * 40px)) scale(calc(.94 + var(--open, 0) * .06)); }
+.desk .bar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.07); font: 700 12px/1 var(--ui); color: var(--soft); }
+.desk .bar .on { color: #8ff0ff; display: inline-flex; align-items: center; gap: 6px; }
+.desk .bar .on::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #59cfe0; box-shadow: 0 0 8px #59cfe0; }
+.desk .bar .sp { flex: 1; }
+.desk .cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.desk .rows { border-right: 1px solid rgba(255,255,255,.07); }
+.desk .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,.06); }
+.desk .row.new { background: rgba(89,207,224,.08); box-shadow: inset 3px 0 0 #59cfe0; }
+.desk .row b { font: 700 14px/1.2 var(--ui); display: block; }
+.desk .row small { font-size: 11.5px; color: var(--dim); }
+.desk .row .go { font: 700 11.5px/1 var(--ui); padding: 7px 10px; border-radius: 7px; background: #59cfe0; color: #03222a; }
+.desk .row .pv { font: 600 11.5px/1 var(--ui); padding: 7px 10px; border-radius: 7px; border: 1px solid rgba(255,255,255,.12); color: var(--soft); }
+.desk .live { padding: 14px; display: grid; gap: 8px; align-content: start; }
+.desk .live h4 { margin: 0; font: 700 11px/1 var(--ui); letter-spacing: .16em; color: #ff6b6b; }
+.desk .live .scr { aspect-ratio: 16 / 9; border-radius: 8px; border: 2px solid #e5484d; background: radial-gradient(120% 100% at 50% 0%, #1d3a4d, #04121a 72%); display: grid; place-items: center; text-align: center; padding: 8%; }
+.desk .live .scr p { font: 400 clamp(12px, 1.3vw, 15px)/1.4 var(--scripture); color: #f2fbff; }
+.desk .live .scr small { display: block; margin-top: 6px; font: 700 9px/1 var(--epic); letter-spacing: .2em; color: var(--sea); }
+@media (max-width: 700px) { .desk .cols { grid-template-columns: minmax(0, 1fr); } .desk .rows { border-right: 0; } }
+.kinds { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.kinds span { font: 600 13px/1 var(--ui); padding: 9px 12px; border-radius: 999px; background: rgba(3,20,28,.75); border: 1px solid rgba(89,207,224,.3); color: #c9f4fb; }
+
+/* IV. the still small voice (plays once when it arrives) */
+#voice .seq { display: grid; gap: 6px; font: 400 clamp(24px, 3.2vw, 42px)/1.15 var(--epic); }
+#voice .seq span { opacity: .22; color: var(--dim); transition: opacity .5s, color .5s, letter-spacing .7s, text-shadow .5s; }
+#voice .seq span.on { opacity: 1; }
+#voice .seq .wind.on { color: #bcd3e6; letter-spacing: .1em; }
+#voice .seq .quake.on { color: #d8c3a5; }
+#voice .seq .fire.on { color: #ffb27e; text-shadow: 0 0 24px rgba(255,123,58,.8); }
+#voice .seq .still.on { color: var(--gold-pale); text-shadow: 0 0 40px rgba(248,224,164,.6); }
+#voice.shake .wrap { animation: shake .4s linear infinite; }
+@keyframes shake { 0%,100% { transform: translate(0,0); } 25% { transform: translate(-5px,3px); } 50% { transform: translate(4px,-3px); } 75% { transform: translate(-3px,-2px); } }
+#voice.flash::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 30% 60%, rgba(255,123,58,.28), transparent 60%); pointer-events: none; }
+.meant { display: grid; gap: 10px; }
+.meant div { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 12px; align-items: center; padding: 13px 16px; border-radius: 14px; background: var(--card); border: 1px solid var(--card-line); }
+.meant q { font: italic 400 17.5px/1.35 var(--scripture); color: var(--soft); }
+.meant i { font-style: normal; color: var(--gold); }
+.meant b { font: 600 15.5px/1.3 var(--ui); color: var(--gold-pale); text-align: right; }
+.meant small { display: block; font: 500 11.5px/1 var(--ui); color: var(--dim); margin-top: 4px; }
+
+/* V. every tongue */
+.phone { width: 230px; max-width: 100%; aspect-ratio: 9 / 18; margin: 0 auto; border-radius: 34px; border: 8px solid #2a1515; background: #faf6ef; color: #2b2116; padding: 18px 14px; display: grid; align-content: start; gap: 10px; box-shadow: 0 30px 80px -20px rgba(255,123,58,.45); }
+.phone .bar { display: flex; gap: 6px; }
+.phone .bar span { flex: 1; font: 700 10px/1 var(--ui); padding: 7px 6px; border-radius: 7px; background: #efe8dc; text-align: center; }
+.phone .bar span.on { background: #2b2116; color: #faf6ef; }
+.phone .ref { font: 700 11px/1 var(--ui); color: #b45309; }
+.phone .t { font: 400 14px/1.5 var(--scripture); min-height: 9em; }
+.phone .cr { font: 500 8.5px/1.4 var(--ui); color: #8c8373; }
+.phone .dl { display: flex; gap: 5px; }
+.phone .dl span { font: 700 10px/1 var(--ui); padding: 6px 8px; border-radius: 6px; background: #efe8dc; }
+.langchips { display: flex; flex-wrap: wrap; gap: 8px; }
+.langchips span { font: 600 13px/1 var(--ui); padding: 9px 12px; border-radius: 999px; border: 1px solid rgba(255,123,58,.3); color: #ffd2b5; background: rgba(40,10,8,.5); }
+
+/* VI. no giant setup */
+.versus { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 40px; }
+.versus > div { border-radius: 18px; padding: 26px; display: grid; gap: 12px; align-content: start; }
+.versus .giant { background: rgba(255,255,255,.02); border: 1px dashed rgba(216,195,165,.25); }
+.versus .giant h3 { font: 700 26px/1 var(--epic); letter-spacing: .08em; color: transparent; -webkit-text-stroke: 1px rgba(216,195,165,.6); }
+.versus .giant li { color: var(--dim); text-decoration: line-through; text-decoration-color: rgba(233,178,76,.7); }
+.versus .stone { background: rgba(233,178,76,.07); border: 1px solid rgba(233,178,76,.35); box-shadow: 0 0 60px -30px rgba(233,178,76,.7); }
+.versus .stone h3 { font: 600 26px/1 var(--epic); letter-spacing: .08em; color: var(--gold-pale); }
+.versus ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 15px; }
+.versus .stone li::before { content: "✦ "; color: var(--gold); }
+@media (max-width: 760px) { .versus { grid-template-columns: minmax(0, 1fr); } }
+
+/* VII. into all the world */
+.screens { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 40px; }
+.scr4 { border-radius: 16px; padding: 18px; background: var(--card); border: 1px solid rgba(233,178,76,.16); display: grid; gap: 8px; align-content: start; }
+.scr4 .g { aspect-ratio: 16 / 9; max-width: 100%; border-radius: 8px; display: grid; place-items: center; text-align: center; padding: 8px; font: 400 12px/1.3 var(--scripture); color: #fff; background: radial-gradient(circle at 50% 0%, #3a2c12, #0b0806 72%); }
+.scr4 .g.stage { background: #000; font: 700 11px/1.3 var(--ui); place-items: start; text-align: left; }
+.scr4 .g.stage em { font-style: normal; color: #22c55e; }
+.scr4 .g.green { background: #00b140; place-items: end stretch; padding: 0; }
+.scr4 .g.green span { margin: 0 8px 8px; padding: 5px 8px; border-radius: 4px; background: rgba(10,10,14,.85); font-size: 10px; text-align: left; }
+.scr4 .g.remote { background: #12100c; font: 700 11px/1 var(--ui); grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 14px; }
+.scr4 .g.remote span { padding: 9px 4px; border-radius: 6px; background: rgba(255,255,255,.08); }
+.scr4 .g.remote span.p { background: var(--gold); color: #1d1200; }
+.scr4 h3 { font: 700 16px/1.25 var(--ui); }
+.scr4 p { font-size: 14.5px; color: var(--soft); }
+@media (max-width: 900px) { .screens { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 40px; }
+.os { position: relative; border-radius: 18px; padding: 22px; background: rgba(12,9,6,.8); border: 1px solid rgba(233,178,76,.2); display: grid; gap: 12px; align-content: start; }
+.os.yours { border-color: var(--gold); box-shadow: 0 0 60px -20px rgba(233,178,76,.7); }
+.os.yours::after { content: "This computer"; position: absolute; top: -11px; left: 20px; font: 800 10.5px/1 var(--ui); letter-spacing: .12em; text-transform: uppercase; padding: 6px 9px; border-radius: 999px; background: var(--gold); color: #1d1200; }
+.os h3 { font: 600 24px/1 var(--epic); letter-spacing: .08em; }
+.os a { display: flex; justify-content: space-between; gap: 12px; text-decoration: none; padding: 12px 14px; border-radius: 8px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); font: 700 14px/1.25 var(--ui); }
+.os a:hover { border-color: var(--gold); }
+.os a:first-of-type { background: var(--gold); color: #1d1200; border-color: var(--gold); }
+.os a small { font: 600 12px/1 var(--ui); opacity: .72; white-space: nowrap; }
+.os .note { font-size: 13px; color: var(--dim); }
+@media (max-width: 900px) { .dl { grid-template-columns: minmax(0, 1fr); } }
+
+
+/* every feature */
+.fgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 40px; }
+.fg { border-radius: 14px; padding: 24px; background: var(--card); border: 1px solid var(--card-line); display: grid; gap: 10px; align-content: start; }
+.fg .k { font: 600 11px/1 var(--epic); letter-spacing: .2em; color: var(--gold); }
+.fg h3 { font: 700 19px/1.25 var(--ui); }
+.fg ul { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.fg li { position: relative; padding-left: 18px; color: var(--soft); font-size: 15px; line-height: 1.5; }
+.fg li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+.fg.remote { border-color: rgba(233,178,76,.35); background: rgba(233,178,76,.05); }
+.fg.wide { grid-column: 1 / -1; }
+.fg .cols3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 24px; }
+.pr { margin-top: 6px; border-radius: 12px; padding: 12px; background: #0c0a08; border: 1px solid rgba(255,255,255,.08); display: grid; gap: 8px; font: 600 12.5px/1.2 var(--ui); }
+.pr-live { color: var(--soft); } .pr-live b { color: var(--ink); }
+.pr-keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.pr-keys span { text-align: center; padding: 9px 4px; border-radius: 6px; background: rgba(255,255,255,.07); color: var(--ink); }
+.pr-keys span.p { background: var(--gold); color: #1d1200; }
+.pr-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 6px; background: rgba(255,255,255,.04); }
+.pr-item span { font-size: 11.5px; color: var(--gold-pale); }
+@media (max-width: 980px) { .fgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fg .cols3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .fgrid, .fg .cols3 { grid-template-columns: minmax(0, 1fr); } }
+/* pricing, guides, changelog, support */
+.plan { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 0; margin-top: 40px; border-radius: 16px; border: 1px solid rgba(233,178,76,.35); overflow: hidden; background: rgba(12,9,6,.6); }
+.plan .price { padding: 36px; display: grid; gap: 14px; align-content: start; border-right: 1px solid rgba(233,178,76,.2); }
+.plan .price .amt { font: 400 clamp(64px, 8vw, 96px)/.9 var(--epic); color: var(--gold-pale); }
+.plan .price .per { font: 600 14px/1.4 var(--ui); color: var(--soft); }
+.plan .incl { padding: 36px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; align-content: start; list-style: none; margin: 0; }
+.plan .incl li { font-size: 15px; color: var(--ink); display: flex; gap: 10px; }
+.plan .incl li::before { content: "✓"; color: var(--gold); font-weight: 700; }
+@media (max-width: 860px) { .plan { grid-template-columns: minmax(0, 1fr); } .plan .price { border-right: 0; border-bottom: 1px solid rgba(233,178,76,.2); } .plan .incl { grid-template-columns: minmax(0, 1fr); } }
+.guides { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 40px; }
+.guide { text-align: left; font: inherit; color: inherit; cursor: pointer; border-radius: 14px; padding: 22px; background: var(--card); border: 1px solid var(--card-line); display: grid; gap: 10px; align-content: start; transition: border-color .2s, background .2s; }
+.guide:hover { border-color: rgba(233,178,76,.5); background: rgba(233,178,76,.05); }
+.guide .cat { font: 700 11px/1 var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.guide h3 { font: 700 18px/1.3 var(--ui); }
+.guide p { font-size: 15px; color: var(--soft); }
+.guide .more { font: 700 13px/1 var(--ui); color: var(--gold-pale); margin-top: 4px; }
+@media (max-width: 900px) { .guides { grid-template-columns: minmax(0, 1fr); } }
+dialog.article { width: min(720px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 0; border-radius: 14px; border: 1px solid rgba(233,178,76,.3); background: #0d0a07; color: var(--ink); }
+dialog.article::backdrop { background: rgba(3,2,6,.75); backdrop-filter: blur(4px); }
+dialog.article .body { padding: clamp(22px, 4vw, 40px); display: grid; gap: 16px; }
+dialog.article h2 { font: 400 clamp(26px, 3.4vw, 36px)/1.15 var(--epic); }
+dialog.article .meta { font: 600 13px/1 var(--ui); color: var(--dim); }
+dialog.article ol { margin: 0; padding-left: 22px; display: grid; gap: 10px; color: var(--soft); }
+dialog.article ol b { color: var(--ink); }
+dialog.article .tip { border-left: 2px solid var(--gold); padding: 4px 0 4px 14px; color: var(--soft); font-size: 15px; }
+dialog.article .close { position: sticky; top: 0; display: flex; justify-content: flex-end; padding: 12px 12px 0; background: linear-gradient(#0d0a07 70%, transparent); }
+dialog.article .close button { font: 700 13px/1 var(--ui); padding: 9px 12px; border-radius: 7px; background: rgba(255,255,255,.06); color: var(--ink); border: 1px solid rgba(255,255,255,.12); cursor: pointer; }
+.log { margin-top: 40px; display: grid; gap: 0; border-left: 1px solid rgba(233,178,76,.3); }
+.rel { position: relative; padding: 0 0 36px 30px; display: grid; gap: 10px; }
+.rel::before { content: ""; position: absolute; left: -6px; top: 6px; width: 11px; height: 11px; border-radius: 50%; background: #0d0a07; border: 2px solid var(--gold); }
+.rel.next::before { background: var(--gold); box-shadow: 0 0 14px var(--gold); }
+.rel .v { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; }
+.rel .v h3 { font: 600 22px/1 var(--epic); letter-spacing: .06em; }
+.rel .v span { font: 600 13px/1 var(--ui); color: var(--dim); }
+.rel .v .badge { font: 700 11px/1 var(--ui); letter-spacing: .1em; text-transform: uppercase; padding: 5px 8px; border-radius: 6px; background: rgba(233,178,76,.15); color: var(--gold-pale); }
+.rel ul { margin: 0; padding-left: 18px; color: var(--soft); display: grid; gap: 6px; font-size: 15px; }
+.rel ul b { color: var(--ink); font-weight: 600; }
+.faq { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin-top: 36px; }
+.faq details { border-bottom: 1px solid rgba(255,255,255,.08); padding-block: 18px; }
+.faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 16px; font: 700 17px/1.35 var(--ui); }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font: 400 22px/1 var(--epic); color: var(--gold); transition: transform .3s; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { margin-top: 10px; color: var(--soft); font-size: 15px; }
+@media (max-width: 820px) { .faq { grid-template-columns: minmax(0, 1fr); } }
+.help { margin-top: 36px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.help a { text-decoration: none; border-radius: 14px; padding: 22px; background: var(--card); border: 1px solid var(--card-line); display: grid; gap: 6px; transition: border-color .2s; }
+.help a:hover { border-color: rgba(233,178,76,.5); }
+.help b { font: 700 17px/1.3 var(--ui); }
+.help span { color: var(--soft); font-size: 15px; }
+@media (max-width: 700px) { .help { grid-template-columns: minmax(0, 1fr); } }
+footer { position: relative; z-index: 1; text-align: center; padding: 30px 16px 60px; color: var(--dim); font-size: 14px; display: grid; gap: 10px; }
+footer em { font: italic 400 19px/1.4 var(--scripture); color: var(--soft); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .rv:not(.in), .step, .verse .w { opacity: 1 !important; transform: none !important; filter: none !important; }
+}
+</style>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<nav class="top" aria-label="Main">
+  <a class="brand" href="#light" aria-label="Hearken Studio">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3c3 4.5 5 7.2 5 10.2A5 5 0 0 1 16 18a5 5 0 0 1-5-4.8C11 10.2 13 7.5 16 3z" fill="#e9b24c"/><path d="M6 22c3.3-1.6 6.7-1.6 10 0 3.3-1.6 6.7-1.6 10 0v6c-3.3-1.6-6.7-1.6-10 0-3.3-1.6-6.7-1.6-10 0z" fill="#f4ede1"/></svg>
+    HEARKEN
+  </a>
+  <div class="links"><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="/support">Support</a><a href="/blog">Blog</a><a href="/changelog">Changelog</a></div>
+  <div class="right"><a class="go" href="#download">Download free</a></div>
+</nav>
+
+<main>
+  <!-- I. Let there be light (pinned) -->
+  <section class="scene" id="light" data-bg="#050409" data-fx="light">
+    <div class="stage"><div class="inner">
+      <p class="chapter">Chapter I · Genesis 1</p>
+      <p class="dark">In the beginning, the screen was dark.</p>
+      <p class="verse" data-words>And God said, Let there be light: and there was light.<cite>GENESIS 1:3</cite></p>
+      <div class="reveal step" data-at=".55">
+        <h1>Say the verse. See the verse.</h1>
+        <p class="tag">Hearken Studio listens to the sermon and puts every scripture on screen in about half a second.</p>
+        <div class="ctas"><a class="btn" href="#download">Download free</a><a class="btn ghost" href="#listen">Begin the journey</a></div>
+      </div>
+      <p class="cue step on" data-at="0">Scroll</p>
+    </div></div>
+  </section>
+
+  <!-- II. The voice in the fire: listening -->
+  <section class="flow" id="listen" data-bg="#120503" data-fx="fire">
+    <div class="wrap">
+      <div class="split">
+        <div class="stack">
+          <p class="eyebrow rv">Chapter II · The voice in the fire</p>
+          <h2 class="h2 rv d1">It hears every word from the pulpit.</h2>
+          <p class="lede rv d2">Connect the sound desk, or any microphone, to the laptop and press <b>Start listening</b>. Speech is transcribed on the laptop itself, so nothing leaves the building and no internet is needed.</p>
+        </div>
+        <div class="feed rv d2" aria-label="Example transcript">
+          <p class="lbl">Listening · sound desk (USB)</p>
+          <div class="meter" aria-hidden="true"><i style="animation-delay:-.1s"></i><i style="animation-delay:-.5s"></i><i style="animation-delay:-.3s"></i><i style="animation-delay:-.8s"></i><i style="animation-delay:-.2s"></i><i style="animation-delay:-.6s"></i><i style="animation-delay:-.4s"></i><i style="animation-delay:-.9s"></i><i style="animation-delay:-.15s"></i><i style="animation-delay:-.7s"></i><i style="animation-delay:-.35s"></i><i style="animation-delay:-.55s"></i></div>
+          <p class="ln"><time>10:41</time>Good morning, church. Today we’re talking about calling.<span class="ok">✓</span></p>
+          <p class="ln"><time>10:42</time>Pastor Adeyemi, would you read for us from <mark>Exodus chapter three</mark>?<span class="ok">✓</span></p>
+          <p class="ln"><time>10:43</time>God called him by name before he called him to a mission.</p>
+        </div>
+      </div>
+      <div class="cards">
+        <article class="card rv"><p class="k">ANY INPUT</p><h3>Your sound, as it is</h3><p>The sound desk through USB or the audio jack, any microphone, or the computer’s own audio for a livestream feed.</p></article>
+        <article class="card rv d1"><p class="k">THE RIGHT WORDS</p><h3>Names come out right</h3><p>Add your pastors’ names, the church and local places. A larger model re-checks each sentence on faster computers.</p></article>
+        <article class="card rv d2"><p class="k">A RECORD</p><h3>Every service, kept</h3><p>Search past sermons by passage or phrase, save recaps, and see the year’s most-preached books and songs.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- III. The way opens: detection (pinned, the sea parts) -->
+  <section class="scene" id="sea" data-bg="#02101a" data-fx="sea">
+    <div class="stage">
+      <canvas id="seaBed" aria-hidden="true"></canvas>
+      <canvas class="wallc" id="wallL" aria-hidden="true"></canvas>
+      <canvas class="wallc" id="wallR" aria-hidden="true"></canvas>
+      <div class="shade" aria-hidden="true"></div>
+      <div class="over">
+        <p class="eyebrow">Chapter III · The way through the sea</p>
+        <h2 class="h2">Say the reference. The way opens.</h2>
+        <p class="lede">“John three sixteen”, “Romans 8 28”, “first Corinthians thirteen, four to seven”. However it’s said, it arrives as a card for your operator with how sure Hearken is. <b>One tap and it’s on screen</b>, or let the sure ones go up by themselves.</p>
+        <div class="desk" aria-label="The operator’s screen">
+          <div class="bar"><span class="on">Listening</span><span>Detections</span><span class="sp"></span><span>about 0.5 s from word to card</span></div>
+          <div class="cols">
+            <div class="rows">
+              <div class="row new"><div><b>John 3:16</b><small>Announced · 95%</small></div><span class="go">Live</span></div>
+              <div class="row"><div><b>Romans 8:28</b><small>Read aloud · 88%</small></div><span class="pv">Preview</span></div>
+              <div class="row"><div><b>1 Peter 5:7</b><small>Same meaning · 64%</small></div><span class="pv">Preview</span></div>
+              <div class="row"><div><b>Amazing Grace</b><small>Song · verse 1</small></div><span class="pv">Preview</span></div>
+            </div>
+            <div class="live"><h4>● ON SCREEN</h4><div class="scr"><div><p>For God so loved the world, that he gave his only begotten Son…</p><small>JOHN 3:16 · KJV</small></div></div></div>
+          </div>
+        </div>
+        <div class="kinds"><span>Announced references</span><span>Verses read aloud</span><span>Said in other words</span><span>From the sermon plan</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IV. The still small voice: accuracy and following -->
+  <section class="flow" id="voice" data-bg="#090b10" data-fx="voice">
+    <div class="wrap">
+      <div class="split">
+        <div class="stack">
+          <p class="eyebrow">Chapter IV · The still small voice</p>
+          <div class="seq" aria-label="Not in the wind, not in the earthquake, not in the fire: a still small voice">
+            <span class="wind">Not in the wind.</span><span class="quake">Not in the earthquake.</span><span class="fire">Not in the fire.</span><span class="still">A still small voice.</span>
+          </div>
+          <p class="lede rv">Pulpits are loud, fast and full of accents. Hearken listens for <b>what was meant</b>: misheard book names, run-together numbers, and verses put in the preacher’s own words.</p>
+        </div>
+        <div class="meant rv d1">
+          <div><q>Exodos twenty</q><i>→</i><b>Exodus 20<small>misheard name</small></b></div>
+          <div><q>John three sixteen</q><i>→</i><b>John 3:16<small>no “chapter” or “verse” needed</small></b></div>
+          <div><q>first Pita five seven</q><i>→</i><b>1 Peter 5:7<small>accent</small></b></div>
+          <div><q>Cast all your anxiety on him</q><i>→</i><b>1 Peter 5:7<small>same meaning</small></b></div>
+        </div>
+      </div>
+      <div class="cards">
+        <article class="card rv"><p class="k">FOLLOWS THE READING</p><h3>Words light up as they’re read</h3><p>The next verse goes up as the reader reaches it, on into the next chapter.</p></article>
+        <article class="card rv d1"><p class="k">FOLLOWS THE WORSHIP</p><h3>Lyrics that keep up</h3><p>Import your songs once. The right section follows the singers, and a CCLI usage report is ready.</p></article>
+        <article class="card rv d2"><p class="k">YOU STAY IN CHARGE</p><h3>Nothing surprises the screen</h3><p>Only references Hearken is very sure of can go up by themselves, and only if you allow it.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- V. Every tongue: languages, phones, recaps -->
+  <section class="flow" id="tongues" data-bg="#150406" data-fx="tongues">
+    <div class="wrap">
+      <div class="split">
+        <div class="stack">
+          <p class="eyebrow rv">Chapter V · Tongues of fire</p>
+          <h2 class="h2 rv d1">Every member, in their own language.</h2>
+          <p class="lede rv d2">KJV, WEB, ASV, BBE and YLT are included. Download <b>Yoruba, Igbo, Hausa, Twi, Ewe, Swahili, French, Spanish, Portuguese or German</b> in a few seconds and use them offline. Show two side by side, or let each person follow on their phone.</p>
+          <div class="langchips rv d3"><span>Yoruba</span><span>Igbo</span><span>Hausa</span><span>Twi</span><span>Ewe</span><span>Swahili</span><span>French</span><span>Spanish</span><span>Portuguese</span><span>German</span></div>
+        </div>
+        <div class="phone rv d2" aria-label="The congregation’s phone page">
+          <div class="bar"><span>KJV</span><span class="on" id="lang">Yoruba</span><span>A+</span></div>
+          <p class="ref" id="ref">John 3:16 · YOR</p>
+          <p class="t" id="txt">Nítorí Ọlọ́run fẹ́ aráyé tó bẹ́ẹ̀ gẹ́ẹ́, tí ó fi ọmọ rẹ̀ kan ṣoṣo fún ni, kí ẹnikẹ́ni tí ó bá gbà á gbọ́, má bà á ṣègbé…</p>
+          <p class="cr" id="cr">Biblica® Open Yoruba Contemporary Bible™ © 2009, 2017 Biblica, Inc.</p>
+          <div class="dl"><span>Recap</span><span>PDF</span><span>Word</span></div>
+        </div>
+      </div>
+      <div class="cards">
+        <article class="card rv"><p class="k">ON EVERY PHONE</p><h3>Scan, follow, zoom</h3><p>A QR code on the screen opens the live verse on members’ phones, in any translation and text size. No app to install.</p></article>
+        <article class="card rv d1"><p class="k">AFTER SERVICE</p><h3>Sermon notes and recap</h3><p>Key points, every scripture shown and the songs, ready as PDF or Word, on the computer or on members’ phones.</p></article>
+        <article class="card rv d2"><p class="k">NAMED PROPERLY</p><h3>Book names in each language</h3><p>“Johanu 3:16” in Yoruba, “Jọn 3:16” in Igbo, with each translation’s copyright shown as its publisher asks.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- VI. A stone and a sling: small, free, offline -->
+  <section class="flow" id="david" data-bg="#120c05" data-fx="david">
+    <div class="wrap">
+      <p class="eyebrow rv">Chapter VI · A stone and a sling</p>
+      <h2 class="h2 rv d1" style="margin-top:18px">No giant setup.</h2>
+      <p class="lede rv d2" style="margin-top:18px">David didn’t need Saul’s armour. Your church doesn’t need new hardware, a subscription or a technician to put the Word on screen.</p>
+      <div class="versus">
+        <div class="giant rv"><h3>What you won’t need</h3><ul><li>A monthly subscription</li><li>Minutes counted against a plan</li><li>An internet connection during service</li><li>An account and a sign-in</li><li>A new computer</li></ul></div>
+        <div class="stone rv d1"><h3>What you get</h3><ul><li>Free, for every church</li><li>Listen as long as the service runs</li><li>Works completely offline</li><li>Nothing to sign up for, nothing recorded off-site</li><li>The laptop you already have, Mac, Windows or Linux</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VII. Into all the world: every screen, then download -->
+  <section class="flow" id="world" data-bg="#07050c" data-fx="world">
+    <div class="wrap">
+      <p class="eyebrow rv">Chapter VII · Into all the world</p>
+      <h2 class="h2 rv d1" style="margin-top:18px">Every screen in the building.</h2>
+      <p class="lede rv d2" style="margin-top:18px">The verse goes everywhere it’s needed at once, styled the way your church likes it: any installed font, your colours, outlines, shadows and background photos.</p>
+      <div class="screens">
+        <div class="scr4 rv"><div class="g">For God so loved the world…</div><h3>Projector and TVs</h3><p>Your look, with the words lighting up as they’re read.</p></div>
+        <div class="scr4 rv d1"><div class="g stage"><span><em>● LIVE</em> 10:42<br><br>For God so loved the world, that he gave…</span></div><h3>Stage display</h3><p>Large text and the time, for the preacher.</p></div>
+        <div class="scr4 rv d2"><div class="g green"><span>JOHN 3:16 · For God so loved the world…</span></div><h3>Livestream</h3><p>A lower third for OBS, vMix or a video switcher.</p></div>
+        <div class="scr4 rv d3"><div class="g remote"><span>◀</span><span class="p">Next ▶</span><span>Black</span></div><h3>Phone remote</h3><p>Next verse, black screen and show, protected by a PIN.</p></div>
+      </div>
+      <div id="download" style="margin-top:110px; text-align:center; display:grid; gap:16px; justify-items:center">
+        <h2 class="h2 rv">Ready by Sunday.</h2>
+        <p class="lede rv d1">Install, connect the sound, press Start listening. Free for Mac, Windows and Linux. Version {{version}}.</p>
+      </div>
+      <div class="dl">
+        <div class="os rv" data-os="mac"><h3>Mac</h3>
+          <a href="{{url:mac-arm}}">Apple Silicon (M1–M4)<small>.dmg · {{size:mac-arm}}</small></a>
+          <a href="{{url:mac-intel}}">Intel Mac<small>.dmg · {{size:mac-intel}}</small></a>
+          <p class="note">First open: System Settings → Privacy &amp; Security → Open Anyway.</p></div>
+        <div class="os rv d1" data-os="win"><h3>Windows</h3>
+          <a href="{{url:win-exe}}">Windows 10 and 11<small>.exe · {{size:win-exe}}</small></a>
+          <a href="{{url:win-msi}}">For IT admins<small>.msi · {{size:win-msi}}</small></a>
+          <p class="note">If SmartScreen appears: More info → Run anyway.</p></div>
+        <div class="os rv d2" data-os="linux"><h3>Linux</h3>
+          <a href="{{url:linux-appimage}}">AppImage (any distro)<small>{{size:linux-appimage}}</small></a>
+          <a href="{{url:linux-deb}}">Ubuntu, Debian<small>.deb · {{size:linux-deb}}</small></a>
+          <a href="{{url:linux-rpm}}">Fedora, openSUSE<small>.rpm · {{size:linux-rpm}}</small></a>
+          <p class="note">For 64-bit PCs.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Every feature -->
+  <section class="flow" id="features" data-bg="#07050c" data-fx="world">
+    <div class="wrap">
+      <p class="eyebrow rv">Features</p>
+      <h2 class="h2 rv d1" style="margin-top:18px">Everything in Hearken Studio.</h2>
+      <p class="lede rv d2" style="margin-top:18px">All of it is included, free, and works on the laptop at the media desk with no internet.</p>
+      <div class="fgrid">
+        <article class="fg rv">
+          <p class="k">DETECTION</p><h3>Hears the scripture</h3>
+          <ul>
+            <li>References said any way: “John three sixteen”, “John 3 16”, “John 316”, no “chapter” or “verse” needed</li>
+            <li>Follow-ups like “verse 18” or “chapter 4”, understood from the passage before</li>
+            <li>Verses read aloud without a reference</li>
+            <li>Verses said in other words, found by meaning</li>
+            <li>Misheard and accented book names: “Exodos”, “Isaya”, “first Pita”</li>
+            <li>Each suggestion shows how sure it is; the sure ones can go live by themselves</li>
+          </ul>
+        </article>
+        <article class="fg rv d1">
+          <p class="k">ACCURACY</p><h3>Gets the words right</h3>
+          <ul>
+            <li>Speech recognised on the laptop, about half a second from word to card</li>
+            <li>An accuracy pass re-checks each sentence with a larger model</li>
+            <li>Names and words to listen for: pastors, the church, local places</li>
+            <li>Sermon plan: paste the notes and the day’s passages are ready and recognised faster</li>
+            <li>Uses the graphics chip on Apple Silicon and PCs with one</li>
+          </ul>
+        </article>
+        <article class="fg rv d2">
+          <p class="k">ON SCREEN</p><h3>Shows it well</h3>
+          <ul>
+            <li>Preview first, then live with one key; Black and Clear in a hurry</li>
+            <li>Follow-along reading: words light up and the next verse goes up by itself</li>
+            <li>Two translations side by side</li>
+            <li>Search by reference or words, and a book, chapter and verse picker</li>
+            <li>Style: any installed font, colours, outlines, shadows, ready-made looks, sample backgrounds and your own photos</li>
+          </ul>
+        </article>
+        <article class="fg remote rv">
+          <p class="k">PHONE REMOTE</p><h3>Run it from anywhere</h3>
+          <ul>
+            <li>Open the remote on any phone on the church Wi‑Fi</li>
+            <li>Previous and next verse, black screen and clear</li>
+            <li>See what was just detected and what’s in the sermon plan, and show any of it</li>
+            <li>Protected by a 4-digit PIN shown on the media desk</li>
+          </ul>
+          <div class="pr" aria-hidden="true"><div class="pr-live">On screen <b>John 3:16</b></div><div class="pr-keys"><span>◀ Prev</span><span class="p">Next ▶</span><span>Black</span><span>Clear</span></div><div class="pr-item"><b>Romans 8:28</b><span>Show</span></div><div class="pr-item"><b>Exodus 20</b><span>Show</span></div></div>
+        </article>
+        <article class="fg rv d1">
+          <p class="k">CONGREGATION</p><h3>On every phone</h3>
+          <ul>
+            <li>A QR code on the projector opens the live verse; no app to install</li>
+            <li>Each person picks a translation and text size</li>
+            <li>Recap button: the service’s scriptures, songs and sermon notes, as PDF or Word</li>
+            <li>A friendly address, hearken.local, or the number address for any phone</li>
+          </ul>
+        </article>
+        <article class="fg rv d2">
+          <p class="k">SCREENS AND STREAMING</p><h3>Every screen in the building</h3>
+          <ul>
+            <li>The main output on any projector or TV</li>
+            <li>Stage display for the preacher: large text and the time</li>
+            <li>Lower third on green or black for a video switcher</li>
+            <li>Livestream overlay for OBS and vMix, with position and size options</li>
+            <li>Up to three extra screens, each with its own look</li>
+          </ul>
+        </article>
+        <article class="fg rv">
+          <p class="k">WORSHIP</p><h3>Follows the singing</h3>
+          <ul>
+            <li>Paste or import your songs once</li>
+            <li>The song being sung is recognised and follows verse to chorus</li>
+            <li>Repeated choruses handled</li>
+            <li>CCLI usage report for your licence</li>
+          </ul>
+        </article>
+        <article class="fg rv d1">
+          <p class="k">BIBLES</p><h3>Your congregation’s languages</h3>
+          <ul>
+            <li>KJV, WEB, ASV, BBE and YLT included</li>
+            <li>Download Yoruba, Igbo, Hausa, Twi, Ewe, Swahili, French, Spanish, Portuguese and German</li>
+            <li>Book names in each language, and copyright lines shown as publishers ask</li>
+          </ul>
+        </article>
+        <article class="fg rv d2">
+          <p class="k">AFTER SERVICE</p><h3>Nothing is lost</h3>
+          <ul>
+            <li>Sermon notes: key points and themes, grouped under each passage</li>
+            <li>Recaps as PDF, Word or a web page</li>
+            <li>A searchable archive of every service</li>
+            <li>Yearly insights: most-preached books and passages, most-sung songs</li>
+          </ul>
+        </article>
+        <article class="fg wide rv">
+          <p class="k">SETUP</p><h3>Works with what you have</h3>
+          <ul class="cols3">
+            <li>Sound desk through USB or the audio jack, any microphone, or the computer’s own audio</li>
+            <li>Mac, Windows and Linux</li>
+            <li>Works completely offline; nothing leaves the building</li>
+            <li>No account to create</li>
+            <li>Updates offered inside the app</li>
+            <li>Keyboard shortcuts for every live action</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="flow" id="pricing" data-bg="#07050c" data-fx="world">
+    <div class="wrap">
+      <p class="eyebrow rv">Pricing</p>
+      <h2 class="h2 rv d1" style="margin-top:18px">Free. Every feature, every Sunday.</h2>
+      <p class="lede rv d2" style="margin-top:18px">No plans to compare and no minutes to count. Download it and use all of it, for as long as your services run.</p>
+      <div class="plan rv">
+        <div class="price"><p class="eyebrow">Hearken Studio</p><p class="amt">$0</p><p class="per">No subscription, no account, no trial period.</p><a class="btn" href="#download" style="justify-self:start">Download free</a></div>
+        <ul class="incl">
+          <li>Unlimited listening</li><li>Announced, quoted and paraphrased verses</li>
+          <li>Follow-along reading</li><li>Worship lyrics and CCLI report</li>
+          <li>16 Bibles, 11 languages to download</li><li>Phones, remote and livestream</li>
+          <li>Stage display and extra screens</li><li>Sermon notes and recaps</li>
+          <li>Searchable sermon archive</li><li>Works offline on Mac, Windows, Linux</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <em>“Thy word is a lamp unto my feet, and a light unto my path.” Psalm 119:105</em>
+  <span><a href="#features">Features</a> · <a href="#pricing">Pricing</a> · <a href="/support">Support</a> · <a href="/blog">Blog</a> · <a href="/changelog">Changelog</a> · <a href="https://github.com/Sagacious123/hearken-studio">GitHub</a></span>
+</footer>
+
+<script>
+(() => {
+  document.documentElement.classList.add("js");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const secs = [...document.querySelectorAll("[data-fx]")];
+  const clamp = (v) => Math.max(0, Math.min(1, v));
+  const ease = (u) => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+  const prog = (el) => { const r = el.getBoundingClientRect(), span = el.offsetHeight - innerHeight; return span > 0 ? clamp(-r.top / span) : clamp(1 - r.top / innerHeight); };
+  const light = document.getElementById("light"), seaSec = document.getElementById("sea");
+
+  /* the opening verse reveals word by word */
+  document.querySelectorAll("[data-words]").forEach((el) => {
+    const cite = el.querySelector("cite"), text = el.firstChild.textContent;
+    el.firstChild.remove();
+    text.trim().split(/\s+/).forEach((w) => { const sp = document.createElement("span"); sp.className = "w"; sp.textContent = w + " "; el.insertBefore(sp, cite); });
+  });
+
+  /* reveal content as it arrives */
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -12% 0px" });
+  document.querySelectorAll(".rv").forEach((el) => io.observe(el));
+
+  /* the still small voice plays once when you reach it */
+  const voice = document.getElementById("voice");
+  const seq = [...voice.querySelectorAll(".seq span")];
+  let played = false, calmAt = 0;
+  new IntersectionObserver((es) => es.forEach((e) => {
+    if (!e.isIntersecting || played) return;
+    played = true;
+    if (reduce) { seq.forEach((s) => s.classList.add("on")); return; }
+    const at = (ms, fn) => setTimeout(fn, ms);
+    at(0, () => seq[0].classList.add("on"));
+    at(1100, () => { seq[1].classList.add("on"); voice.classList.add("shake"); });
+    at(2200, () => { voice.classList.remove("shake"); seq[2].classList.add("on"); voice.classList.add("flash"); });
+    at(3200, () => { voice.classList.remove("flash"); seq[3].classList.add("on"); calmAt = performance.now(); });
+  }), { threshold: .45 }).observe(voice);
+
+  /* phone cycles languages */
+  const langs = [
+    ["Yoruba", "Johanu 3:16 · YOR", "Nítorí Ọlọ́run fẹ́ aráyé tó bẹ́ẹ̀ gẹ́ẹ́, tí ó fi ọmọ rẹ̀ kan ṣoṣo fún ni, kí ẹnikẹ́ni tí ó bá gbà á gbọ́, má bà á ṣègbé…", "Biblica® Open Yoruba Contemporary Bible™ © 2009, 2017 Biblica, Inc."],
+    ["Igbo", "Jọn 3:16 · IGBO", "Nʼihi na Chineke hụrụ ụwa nʼanya, nke a mere o jiri nye Ọkpara ọ mụrụ naanị ya, ka onye ọbụla kweere na ya ghara ịla nʼiyi…", "Biblica® Open Igbo Contemporary Bible™ © 2020 Biblica, Inc."],
+    ["Hausa", "Yohanna 3:16 · HAU", "Gama Allah ya ƙaunaci duniya sosai har ya ba da wanda yake Ɗaya kuma Makaɗaicin Ɗansa domin duk wanda ya gaskata da shi kada yă hallaka…", "Biblica® Open Hausa Contemporary Bible™ © 2009, 2020 Biblica, Inc."],
+    ["French", "Jean 3:16 · LSG", "Car Dieu a tant aimé le monde qu’il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu’il ait la vie éternelle.", "Louis Segond 1910, public domain"],
+  ];
+  let li = 0;
+  if (!reduce) setInterval(() => {
+    li = (li + 1) % langs.length; const [n, r, t, c] = langs[li];
+    document.getElementById("lang").textContent = n; document.getElementById("ref").textContent = r;
+    document.getElementById("txt").textContent = t; document.getElementById("cr").textContent = c;
+  }, 3200);
+
+  /* ---------- scroll: which chapter, how far through it ---------- */
+  let active = secs[0], gp = 0, sparks = [];
+  function onScroll() {
+    const mid = innerHeight * .5, was = active;
+    active = secs.find((s) => { const r = s.getBoundingClientRect(); return r.top <= mid && r.bottom > mid; }) || active;
+    if (active !== was) sparks.forEach((s) => (s.life = Math.min(s.life, .2)));
+    document.body.style.backgroundColor = active.dataset.bg;
+    gp = reduce ? 1 : prog(light);
+    const ws = light.querySelectorAll(".verse .w");
+    ws.forEach((w, i) => w.classList.toggle("on", gp >= (i / ws.length) * .45));
+    light.querySelectorAll(".step[data-at]").forEach((e) => e.classList.toggle("on", gp >= parseFloat(e.dataset.at)));
+    light.classList.toggle("lit", gp > .5);
+    const open = reduce ? 1 : ease(clamp((prog(seaSec) - .08) / .55));
+    seaSec.style.setProperty("--open", open.toFixed(3));
+  }
+
+  /* ---------- the sky behind every chapter (one light canvas) ---------- */
+  const c = document.getElementById("sky"), x = c.getContext("2d");
+  let W = 0, H = 0, stars = [];
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  function size() {
+    const d = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
+    c.width = W * d; c.height = H * d; x.setTransform(d, 0, 0, d, 0, 0);
+    stars = Array.from({ length: Math.round(W * H / 6000) }, () => ({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.3 + .2, t: Math.random() * 6.3 }));
+  }
+  function sky(t) {
+    x.clearRect(0, 0, W, H);
+    const fx = active.dataset.fx, p = gp;
+    if (fx === "sea") return; // the sea paints itself; nothing to draw behind it
+    const starA = fx === "light" ? Math.max(.15, 1 - p * 1.4) : fx === "world" || fx === "voice" ? .4 : .12;
+    for (const s of stars) { x.globalAlpha = starA * (.5 + .5 * Math.sin(t / 900 + s.t)); x.fillStyle = "#fff"; x.fillRect(s.x, s.y, s.r, s.r); }
+    x.globalAlpha = 1;
+    if (fx === "light") {
+      // Let there be light: a centred dawn that grows to a gentle limit, never filling the screen.
+      const k = Math.min(.55, Math.max(0, (p - .25) / .5)), R = Math.max(W, H) * (.1 + k * 1.1);
+      const g = x.createRadialGradient(W / 2, H * .46, 0, W / 2, H * .46, R);
+      g.addColorStop(0, `rgba(255,248,228,${.42 * Math.min(1, k * 1.6)})`); g.addColorStop(.3, `rgba(248,224,164,${.2 * Math.min(1, k * 1.4)})`);
+      g.addColorStop(.65, `rgba(233,178,76,${.07 * k})`); g.addColorStop(1, "rgba(233,178,76,0)");
+      x.fillStyle = g; x.fillRect(0, 0, W, H);
+      if (k > 0) { // rays
+        x.save(); x.translate(W / 2, H * .46); x.globalCompositeOperation = "lighter";
+        for (let i = 0; i < 18; i++) { x.rotate(Math.PI * 2 / 18); x.fillStyle = `rgba(255,236,190,${.018 * k})`; x.beginPath(); x.moveTo(0, 0); x.lineTo(R * 1.2, -R * .05); x.lineTo(R * 1.2, R * .05); x.closePath(); x.fill(); }
+        x.restore();
+      }
+    }
+    if (fx === "fire" || fx === "tongues") {
+      const g = x.createRadialGradient(W / 2, H * 1.1, 0, W / 2, H * 1.1, H); g.addColorStop(0, "rgba(255,110,40,.32)"); g.addColorStop(1, "rgba(255,110,40,0)"); x.fillStyle = g; x.fillRect(0, 0, W, H);
+      if (!reduce && sparks.length < 150) for (let i = 0; i < 2; i++) sparks.push({ x: rnd(0, W), y: H + 8, vx: rnd(-.35, .35), vy: rnd(-2.2, -.8), life: 1, r: rnd(.8, 2.6), g: rnd(90, 190) | 0 });
+    }
+    if (fx === "voice" && calmAt) { const a = clamp((performance.now() - calmAt) / 1200) * .5; x.strokeStyle = `rgba(248,224,164,${a})`; x.lineWidth = 1.5; x.beginPath(); for (let i = 0; i <= W; i += 8) x.lineTo(i, H * .9 + Math.sin(i / 60 + t / 700) * 6 * Math.sin(i / W * Math.PI)); x.stroke(); }
+    if (fx === "david" || fx === "world") { const g = x.createRadialGradient(W / 2, H * .15, 0, W / 2, H * .15, H); g.addColorStop(0, "rgba(233,178,76,.14)"); g.addColorStop(1, "rgba(233,178,76,0)"); x.fillStyle = g; x.fillRect(0, 0, W, H); }
+    x.globalCompositeOperation = "lighter";
+    sparks = sparks.filter((s) => s.life > 0 && s.y > -20);
+    for (const s of sparks) { s.x += s.vx; s.y += s.vy; s.life -= .006; x.fillStyle = `rgba(255,${s.g},50,${s.life * .75})`; x.beginPath(); x.arc(s.x + Math.sin(t / 400 + s.y / 40) * 1.5, s.y, s.r, 0, 6.3); x.fill(); }
+    x.globalCompositeOperation = "source-over";
+  }
+
+  /* ---------- the sea: painted once, parted by sliding ---------- */
+  function seeded(seed) { let v = seed; return () => (v = (v * 16807) % 2147483647) / 2147483647; }
+  function fit(cv) {
+    const d = Math.min(devicePixelRatio || 1, 2), r = cv.getBoundingClientRect();
+    const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
+    cv.width = w * d; cv.height = h * d; const g = cv.getContext("2d"); g.setTransform(d, 0, 0, d, 0, 0);
+    return [g, w, h];
+  }
+  function paintBed() {
+    const [g, w, h] = fit(document.getElementById("seaBed"));
+    const skyG = g.createLinearGradient(0, 0, 0, h); skyG.addColorStop(0, "#081c28"); skyG.addColorStop(.55, "#0c2734"); skyG.addColorStop(1, "#1a2a2a");
+    g.fillStyle = skyG; g.fillRect(0, 0, w, h);
+    // the dry path, narrowing into the distance
+    const cx = w / 2, ground = g.createLinearGradient(0, h * .48, 0, h); ground.addColorStop(0, "#3a3426"); ground.addColorStop(1, "#7a6444");
+    g.fillStyle = ground; g.beginPath(); g.moveTo(cx - w * .03, h * .5); g.lineTo(cx + w * .03, h * .5); g.lineTo(cx + w * .36, h); g.lineTo(cx - w * .36, h); g.closePath(); g.fill();
+    const rnd = seeded(7);
+    g.fillStyle = "rgba(255,230,180,.08)";
+    for (let i = 0; i < 260; i++) { const yy = h * .5 + rnd() * h * .5, spread = (yy - h * .5) / (h * .5); g.fillRect(cx + (rnd() - .5) * w * (.06 + spread * .66), yy, 1.5, 1.5); }
+    // light pouring down onto the path
+    const beam = g.createLinearGradient(0, 0, 0, h); beam.addColorStop(0, "rgba(255,244,210,.42)"); beam.addColorStop(1, "rgba(255,244,210,0)");
+    g.fillStyle = beam; g.beginPath(); g.moveTo(cx - w * .08, 0); g.lineTo(cx + w * .08, 0); g.lineTo(cx + w * .3, h); g.lineTo(cx - w * .3, h); g.closePath(); g.fill();
+  }
+  function paintWall(id, mirror) {
+    const [g, w, h] = fit(document.getElementById(id));
+    if (mirror) { g.translate(w, 0); g.scale(-1, 1); }
+    const rnd = seeded(mirror ? 99 : 41);
+    const crest = h * .1;
+    // the water's face: an irregular, still edge
+    const face = (y) => w - 30 - (Math.sin(y / 53 + (mirror ? 2 : 0)) * 9 + Math.sin(y / 21 + 1.3) * 4 + Math.sin(y / 140 + .5) * 16);
+    const outline = () => {
+      g.beginPath(); g.moveTo(0, h); g.lineTo(0, crest + 46);
+      for (let i = 0; i <= 40; i++) { const u = i / 40; g.lineTo(face(crest) * u, crest + 46 - u * 40 - Math.sin(u * Math.PI) * 18 + Math.sin(u * 13) * 4); }
+      for (let y = crest + 6; y <= h; y += 4) g.lineTo(face(y), y);
+      g.closePath();
+    };
+    // body: deep and dark away from the face, glassy and bright at it
+    const body = g.createLinearGradient(0, 0, w, 0);
+    body.addColorStop(0, "#010d15"); body.addColorStop(.45, "#03304a"); body.addColorStop(.78, "#086b85"); body.addColorStop(.93, "#2bb8cf"); body.addColorStop(.985, "#a6eef8"); body.addColorStop(1, "#e8fcff");
+    outline(); g.fillStyle = body; g.fill();
+    g.save(); outline(); g.clip();
+    // light from above, deep water below
+    const depth = g.createLinearGradient(0, 0, 0, h); depth.addColorStop(0, "rgba(160,235,250,.22)"); depth.addColorStop(.35, "rgba(160,235,250,0)"); depth.addColorStop(1, "rgba(0,6,12,.55)");
+    g.fillStyle = depth; g.fillRect(0, 0, w, h);
+    // layers in the water, gently curved
+    for (let y = crest + 30; y < h; y += 11) {
+      g.strokeStyle = `rgba(170,235,248,${.03 + rnd() * .05})`; g.lineWidth = 1; g.beginPath();
+      const amp = 3 + rnd() * 4, ph = rnd() * 6;
+      for (let xx = 0; xx <= face(y) - 4; xx += 12) g.lineTo(xx, y + Math.sin(xx / 70 + ph) * amp);
+      g.stroke();
+    }
+    // refraction band just inside the face
+    for (let y = crest; y < h; y += 3) { const fx = face(y); const gr = g.createLinearGradient(fx - 70, 0, fx, 0); gr.addColorStop(0, "rgba(200,250,255,0)"); gr.addColorStop(1, "rgba(200,250,255,.10)"); g.fillStyle = gr; g.fillRect(fx - 70, y, 70, 3); }
+    // caustic glints and bubbles
+    for (let i = 0; i < 140; i++) { const y = crest + rnd() * (h - crest), fx = face(y), xx = fx - Math.pow(rnd(), 2) * w * .6; g.fillStyle = `rgba(210,250,255,${.05 + rnd() * .14})`; g.beginPath(); g.ellipse(xx, y, 4 + rnd() * 12, 1 + rnd() * 1.6, (rnd() - .5) * .5, 0, 6.3); g.fill(); }
+    for (let i = 0; i < 70; i++) { const y = crest + rnd() * (h - crest), xx = face(y) - rnd() * w * .5, r = .8 + rnd() * 2.4; g.strokeStyle = `rgba(220,252,255,${.15 + rnd() * .25})`; g.lineWidth = .8; g.beginPath(); g.arc(xx, y, r, 0, 6.3); g.stroke(); }
+    g.restore();
+    // foam along the face and over the crest
+    for (let y = crest; y < h; y += 3) { const fx = face(y); if (rnd() > .35) { g.fillStyle = `rgba(240,253,255,${.25 + rnd() * .5})`; g.beginPath(); g.arc(fx - rnd() * 5, y, .8 + rnd() * 2.2, 0, 6.3); g.fill(); } }
+    for (let i = 0; i < 160; i++) { const u = rnd(); g.fillStyle = `rgba(240,253,255,${.2 + rnd() * .55})`; g.beginPath(); g.arc(face(crest) * u, crest + 46 - u * 40 - Math.sin(u * Math.PI) * 18 + (rnd() - .5) * 10, 1 + rnd() * 3, 0, 6.3); g.fill(); }
+    // a few drops held in the air beside the face
+    for (let i = 0; i < 40; i++) { const y = crest + rnd() * h * .8; g.fillStyle = `rgba(225,250,255,${.25 + rnd() * .4})`; g.fillRect(face(y) + 3 + rnd() * 18, y, 1.6, 1.6); }
+  }
+  function paintSea() { paintBed(); paintWall("wallL", false); paintWall("wallR", true); }
+
+  size(); onScroll(); paintSea(); sky(0);
+  let resizeTimer;
+  addEventListener("resize", () => { size(); onScroll(); clearTimeout(resizeTimer); resizeTimer = setTimeout(paintSea, 150); });
+  addEventListener("scroll", onScroll, { passive: true });
+  if (!reduce) (function loop(ms) { if (!document.hidden) sky(ms); requestAnimationFrame(loop); })(0);
+
+  const ua = navigator.userAgent;
+  const os = /Mac|iPhone|iPad/.test(ua) ? "mac" : /Win/.test(ua) ? "win" : /Linux|X11/.test(ua) && !/Android/.test(ua) ? "linux" : null;
+  if (os) document.querySelector(`.os[data-os="${os}"]`)?.classList.add("yours");
+})();
+</script>

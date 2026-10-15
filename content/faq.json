@@ -1,0 +1,42 @@
+[
+ {
+  "q": "Do we still need someone at the media desk?",
+  "a": "Yes, and their job gets easier. Hearken suggests; the operator decides. Only references it’s very sure of can go up by themselves, and only if you turn that on."
+ },
+ {
+  "q": "Does it need the internet?",
+  "a": "No. Listening and recognition run on the laptop. You need a connection only to download the app, add a translation, or update."
+ },
+ {
+  "q": "What computer do we need?",
+  "a": "Any recent Mac, Windows or Linux laptop. Faster computers, such as Apple Silicon Macs or PCs with a graphics card, can also use the extra-accurate models."
+ },
+ {
+  "q": "A verse wasn’t detected. What can we do?",
+  "a": "Check the level meter moves when the pastor speaks, add names and words to listen for under Accuracy, and put the day’s readings in the Plan tab so they’re ready and recognised faster."
+ },
+ {
+  "q": "Detections feel slow.",
+  "a": "Open Accuracy and choose Automatic, then stop and start listening. A larger model that’s too slow for the computer is skipped automatically; the panel warns you if you’ve chosen one."
+ },
+ {
+  "q": "Phones can’t open hearken.local.",
+  "a": "Some Android phones can’t open .local addresses. The QR code always works, and the Share panel shows a number address to type instead. Phones must be on the same Wi‑Fi as the laptop."
+ },
+ {
+  "q": "The phone remote asks for a PIN.",
+  "a": "The PIN is shown in the Share panel on the media desk. It changes each time Hearken starts, so only people in the room can use the remote."
+ },
+ {
+  "q": "macOS says it can’t verify the developer.",
+  "a": "Open System Settings → Privacy & Security and click Open Anyway. You only need to do this the first time."
+ },
+ {
+  "q": "Which Bibles are included?",
+  "a": "KJV, WEB, ASV, BBE and YLT, plus downloadable Yoruba, Igbo, Hausa, Twi, Ewe, Swahili, French, Spanish, Portuguese and German translations whose licences allow free use."
+ },
+ {
+  "q": "Can we project song lyrics?",
+  "a": "Yes. Import your songs in the Songs tab and Hearken follows the singing. It includes no lyrics; import only songs your church is licensed to project."
+ }
+]

@@ -1,0 +1,278 @@
+[
+ {
+  "version": "0.1.2",
+  "date": "2026-10-12T20:16:06Z",
+  "body": "## What's new in Hearken Studio 0.1.2\n\n### More accurate transcription\n- **Accuracy pass:** a larger speech model re-checks each finished sentence, so names, accents and Bible words come out right more often. Checked lines are marked ✓ in the transcript.\n- Download **Small** (190 MB) or **Large v3 Turbo** (574 MB) from the new **Accuracy** button. Each model is speed-tested on your computer, and **Automatic** picks the most accurate one that keeps up.\n- **Names and words to listen for:** add your pastors' names, your church's name and local places so they're transcribed correctly.\n- On computers without a graphics chip, the accuracy pass runs gently in the background so live detection stays fast. Turn it **Off** for the very fastest detection.\n\n### Style your screen\n- New **Style** panel (top bar) slides in beside the Preview, so you see changes as you make them.\n- Eight included fonts, colours, sizes, spacing and alignment, plus six ready-made looks.\n- Nine sample backgrounds, or **upload your own images**, with sliders to darken and soften busy photos.\n- Changes appear in Preview first; nothing reaches the screen until you click **Apply to screen**.\n\n### Find passages faster\n- **Book / Chapter / Verse picker** under the search box: type \"jn\", \"1cor\" or \"ps\", then the chapter and verses. Values are checked against the real chapter and verse counts, and the Preview updates as you type.\n\n### Phones and sharing\n- Friendlier addresses: phones now open **hearken.local** instead of a number address (you can choose the name, e.g. `grace-chapel.local`). The number address and QR code still work for every phone.\n- The congregation page and the phone remote now fit phone screens properly, and the remote keeps its controls in reach while you scroll.\n\n### Fixes\n- The app could feel sluggish: clicks now respond straight away, even while listening.\n- Fixed a problem that could blank the dashboard on newer systems.\n- The Input menu now finds microphones plugged in after the app started.\n- Preview and Live boxes no longer get cut off; panels close when you click outside them.\n\n### Installing\n- **Mac:** open the `.dmg` (Apple Silicon: `aarch64`, Intel: `x64`). The first time, macOS may say it can't verify the developer: open **System Settings → Privacy & Security** and click **Open Anyway**.\n- **Windows:** run the `.exe` installer. If Windows SmartScreen appears, click **More info → Run anyway**.\n- **Already installed?** The app offers this update automatically: click **Install & restart** when you're not listening.\n",
+  "assets": [
+   {
+    "name": "Hearken.Studio-0.1.2-1.x86_64.rpm",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio-0.1.2-1.x86_64.rpm",
+    "size": 111610494
+   },
+   {
+    "name": "Hearken.Studio-0.1.2-1.x86_64.rpm.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio-0.1.2-1.x86_64.rpm.sig",
+    "size": 444
+   },
+   {
+    "name": "Hearken.Studio_0.1.2_aarch64.dmg",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_0.1.2_aarch64.dmg",
+    "size": 109390581
+   },
+   {
+    "name": "Hearken.Studio_0.1.2_amd64.AppImage",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_0.1.2_amd64.AppImage",
+    "size": 187570680
+   },
+   {
+    "name": "Hearken.Studio_0.1.2_amd64.AppImage.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_0.1.2_amd64.AppImage.sig",
+    "size": 448
+   },
+   {
+    "name": "Hearken.Studio_0.1.2_amd64.deb",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_0.1.2_amd64.deb",
+    "size": 111611942
+   },
+   {
+    "name": "Hearken.Studio_0.1.2_amd64.deb.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_0.1.2_amd64.deb.sig",
+    "size": 440
+   },
+   {
+    "name": "Hearken.Studio_0.1.2_x64-setup.exe",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_0.1.2_x64-setup.exe",
+    "size": 99950819
+   },
+   {
+    "name": "Hearken.Studio_0.1.2_x64-setup.exe.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_0.1.2_x64-setup.exe.sig",
+    "size": 444
+   },
+   {
+    "name": "Hearken.Studio_0.1.2_x64.dmg",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_0.1.2_x64.dmg",
+    "size": 110181273
+   },
+   {
+    "name": "Hearken.Studio_0.1.2_x64_en-US.msi",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_0.1.2_x64_en-US.msi",
+    "size": 112910336
+   },
+   {
+    "name": "Hearken.Studio_0.1.2_x64_en-US.msi.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_0.1.2_x64_en-US.msi.sig",
+    "size": 444
+   },
+   {
+    "name": "Hearken.Studio_aarch64.app.tar.gz",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_aarch64.app.tar.gz",
+    "size": 109023627
+   },
+   {
+    "name": "Hearken.Studio_aarch64.app.tar.gz.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_aarch64.app.tar.gz.sig",
+    "size": 432
+   },
+   {
+    "name": "Hearken.Studio_x64.app.tar.gz",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_x64.app.tar.gz",
+    "size": 109721915
+   },
+   {
+    "name": "Hearken.Studio_x64.app.tar.gz.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/Hearken.Studio_x64.app.tar.gz.sig",
+    "size": 432
+   },
+   {
+    "name": "latest.json",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.2/latest.json",
+    "size": 6991
+   }
+  ]
+ },
+ {
+  "version": "0.1.1",
+  "date": "2026-10-11T06:21:09Z",
+  "body": "See the assets below to download. Existing installs will offer this update automatically once published.",
+  "assets": [
+   {
+    "name": "Hearken.Studio-0.1.1-1.x86_64.rpm",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio-0.1.1-1.x86_64.rpm",
+    "size": 109996481
+   },
+   {
+    "name": "Hearken.Studio-0.1.1-1.x86_64.rpm.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio-0.1.1-1.x86_64.rpm.sig",
+    "size": 444
+   },
+   {
+    "name": "Hearken.Studio_0.1.1_aarch64.dmg",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_0.1.1_aarch64.dmg",
+    "size": 108155914
+   },
+   {
+    "name": "Hearken.Studio_0.1.1_amd64.AppImage",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_0.1.1_amd64.AppImage",
+    "size": 186034680
+   },
+   {
+    "name": "Hearken.Studio_0.1.1_amd64.AppImage.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_0.1.1_amd64.AppImage.sig",
+    "size": 448
+   },
+   {
+    "name": "Hearken.Studio_0.1.1_amd64.deb",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_0.1.1_amd64.deb",
+    "size": 109996752
+   },
+   {
+    "name": "Hearken.Studio_0.1.1_amd64.deb.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_0.1.1_amd64.deb.sig",
+    "size": 440
+   },
+   {
+    "name": "Hearken.Studio_0.1.1_x64-setup.exe",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_0.1.1_x64-setup.exe",
+    "size": 98547772
+   },
+   {
+    "name": "Hearken.Studio_0.1.1_x64-setup.exe.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_0.1.1_x64-setup.exe.sig",
+    "size": 444
+   },
+   {
+    "name": "Hearken.Studio_0.1.1_x64.dmg",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_0.1.1_x64.dmg",
+    "size": 108896818
+   },
+   {
+    "name": "Hearken.Studio_0.1.1_x64_en-US.msi",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_0.1.1_x64_en-US.msi",
+    "size": 111333376
+   },
+   {
+    "name": "Hearken.Studio_0.1.1_x64_en-US.msi.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_0.1.1_x64_en-US.msi.sig",
+    "size": 444
+   },
+   {
+    "name": "Hearken.Studio_aarch64.app.tar.gz",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_aarch64.app.tar.gz",
+    "size": 107748899
+   },
+   {
+    "name": "Hearken.Studio_aarch64.app.tar.gz.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_aarch64.app.tar.gz.sig",
+    "size": 432
+   },
+   {
+    "name": "Hearken.Studio_x64.app.tar.gz",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_x64.app.tar.gz",
+    "size": 108411723
+   },
+   {
+    "name": "Hearken.Studio_x64.app.tar.gz.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/Hearken.Studio_x64.app.tar.gz.sig",
+    "size": 432
+   },
+   {
+    "name": "latest.json",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.1/latest.json",
+    "size": 6991
+   }
+  ]
+ },
+ {
+  "version": "0.1.0",
+  "date": "2026-10-11T01:06:43Z",
+  "body": "See the assets below to download. Existing installs will offer this update automatically once published.",
+  "assets": [
+   {
+    "name": "Hearken.Studio-0.1.0-1.x86_64.rpm",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio-0.1.0-1.x86_64.rpm",
+    "size": 109992106
+   },
+   {
+    "name": "Hearken.Studio-0.1.0-1.x86_64.rpm.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio-0.1.0-1.x86_64.rpm.sig",
+    "size": 444
+   },
+   {
+    "name": "Hearken.Studio_0.1.0_aarch64.dmg",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_0.1.0_aarch64.dmg",
+    "size": 108153991
+   },
+   {
+    "name": "Hearken.Studio_0.1.0_amd64.AppImage",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_0.1.0_amd64.AppImage",
+    "size": 186026488
+   },
+   {
+    "name": "Hearken.Studio_0.1.0_amd64.AppImage.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_0.1.0_amd64.AppImage.sig",
+    "size": 448
+   },
+   {
+    "name": "Hearken.Studio_0.1.0_amd64.deb",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_0.1.0_amd64.deb",
+    "size": 109992658
+   },
+   {
+    "name": "Hearken.Studio_0.1.0_amd64.deb.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_0.1.0_amd64.deb.sig",
+    "size": 440
+   },
+   {
+    "name": "Hearken.Studio_0.1.0_x64-setup.exe",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_0.1.0_x64-setup.exe",
+    "size": 98531271
+   },
+   {
+    "name": "Hearken.Studio_0.1.0_x64-setup.exe.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_0.1.0_x64-setup.exe.sig",
+    "size": 444
+   },
+   {
+    "name": "Hearken.Studio_0.1.0_x64.dmg",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_0.1.0_x64.dmg",
+    "size": 108858153
+   },
+   {
+    "name": "Hearken.Studio_0.1.0_x64_en-US.msi",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_0.1.0_x64_en-US.msi",
+    "size": 111218688
+   },
+   {
+    "name": "Hearken.Studio_0.1.0_x64_en-US.msi.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_0.1.0_x64_en-US.msi.sig",
+    "size": 444
+   },
+   {
+    "name": "Hearken.Studio_aarch64.app.tar.gz",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_aarch64.app.tar.gz",
+    "size": 107747249
+   },
+   {
+    "name": "Hearken.Studio_aarch64.app.tar.gz.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_aarch64.app.tar.gz.sig",
+    "size": 432
+   },
+   {
+    "name": "Hearken.Studio_x64.app.tar.gz",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_x64.app.tar.gz",
+    "size": 108410681
+   },
+   {
+    "name": "Hearken.Studio_x64.app.tar.gz.sig",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/Hearken.Studio_x64.app.tar.gz.sig",
+    "size": 432
+   },
+   {
+    "name": "latest.json",
+    "url": "https://github.com/sagacious123/hearken-studio/releases/download/v0.1.0/latest.json",
+    "size": 6991
+   }
+  ]
+ }
+]

@@ -1,0 +1,58 @@
+[
+ {
+  "slug": "sound-desk",
+  "category": "Setup",
+  "minutes": "3 min",
+  "title": "Connect your sound desk",
+  "blurb": "Get the cleanest sound into Hearken, from a desk, a microphone or a livestream.",
+  "body": "<p class=\"lede\">The clearer the sound, the faster and more accurate Hearken is. A direct feed from the desk beats a microphone in the room.</p>\n  <ol><li>Run a cable from the desk’s <b>aux, record or matrix output</b> into the laptop’s audio input, or into a <b>USB audio adapter</b>.</li>\n  <li>In Hearken, open the <b>Input</b> menu and pick that input. The list refreshes when you point at it, so devices plugged in later appear.</li>\n  <li>Ask someone to speak at the pulpit and watch the <b>level meter</b> next to the menu move.</li>\n  <li>Press <b>Start listening</b>. The first start times your computer and picks the right speed settings.</li></ol>\n  <p class=\"tip\">If the meter barely moves, raise the send on the desk rather than the laptop’s input volume. To listen to the computer’s own audio instead (a livestream feed), choose an input marked 🔁 on Windows, or install BlackHole on a Mac.</p>"
+ },
+ {
+  "slug": "projector",
+  "category": "Projection",
+  "minutes": "2 min",
+  "title": "Put the verses on the projector",
+  "blurb": "Send the output to a second screen, and black it out or clear it in a hurry.",
+  "body": "<ol><li>Connect the projector or TV as a <b>second display</b>.</li>\n  <li>Choose it in the display menu next to <b>Open output</b>, or leave it on <b>Auto</b> to use the second display.</li>\n  <li>Click <b>Open output</b>. It fills that screen; press <b>Esc</b> on it to close it.</li>\n  <li>Use <b>Black (B)</b> to black out the screen and <b>Clear (Esc)</b> to remove the verse. <b>Verse ▶</b> steps to the next verse.</li></ol>\n  <p class=\"tip\">On a laptop with no projector attached, the output opens as an ordinary window so you can rehearse.</p>"
+ },
+ {
+  "slug": "livestream",
+  "category": "Livestream",
+  "minutes": "4 min",
+  "title": "Add a lower third in OBS or vMix",
+  "blurb": "Show each verse over your livestream as a clean caption.",
+  "body": "<ol><li>Click <b>Share</b> and switch on sharing on the local network.</li>\n  <li>Copy the <b>livestream overlay</b> address, for example <b>http://hearken.local/overlay</b>.</li>\n  <li>In OBS, add a <b>Browser</b> source, set it to 1920 × 1080 and paste the address. In vMix, add a Web Browser input.</li>\n  <li>Each verse now appears as a caption at the bottom. Add <b>?pos=top</b> to the address to move it to the top.</li></ol>\n  <p class=\"tip\">Using a hardware video switcher? Open <b>Screens</b>, add a <b>Lower third</b> screen on green or black, and key it out on the switcher.</p>"
+ },
+ {
+  "slug": "phone-remote",
+  "category": "Control",
+  "minutes": "2 min",
+  "title": "Run the screen from your phone",
+  "blurb": "Next verse, black screen and show any detection, from anywhere in the room.",
+  "body": "<p class=\"lede\">The phone remote lets a pastor, worship leader or second volunteer move the screen on from anywhere in the room.</p>\n  <ol><li>Click <b>Share</b> on the media desk and switch on sharing. The phone must be on the same Wi‑Fi as the laptop.</li>\n  <li>Open the <b>Remote</b> address shown in the Share panel, for example <b>http://hearken.local/remote</b>, on the phone.</li>\n  <li>Enter the <b>4-digit PIN</b> shown in the Share panel. It changes each time Hearken starts.</li>\n  <li>Use <b>Previous</b> and <b>Next</b> to step through verses, <b>Black</b> to black out the screen and <b>Clear</b> to remove the verse.</li>\n  <li>Below the buttons are the latest detections and the sermon plan. Tap <b>Show</b> on any of them to put it on screen.</li></ol>\n  <p class=\"tip\">The media desk stays in charge: anything sent from the remote also appears on the dashboard’s Live screen, and the operator can change it at any time.</p>"
+ },
+ {
+  "slug": "phones",
+  "category": "Congregation",
+  "minutes": "3 min",
+  "title": "Let members follow on their phones",
+  "blurb": "A QR code on the screen, any translation and text size, and the recap after service.",
+  "body": "<ol><li>Click <b>Share</b> and switch on sharing. Phones must be on the same Wi‑Fi as the laptop.</li>\n  <li>Click <b>Show QR on screen</b>. A code appears in the corner of the projector.</li>\n  <li>Members scan it and see the live verse. They can choose any translation and make the text bigger.</li>\n  <li>After the sermon, the <b>Recap</b> button on their phone opens the scriptures, songs and sermon notes, with PDF and Word downloads.</li></ol>\n  <p class=\"tip\">Some Android phones can’t open .local addresses. The QR code always works.</p>"
+ },
+ {
+  "slug": "bibles",
+  "category": "Bibles",
+  "minutes": "2 min",
+  "title": "Add Yoruba, Igbo or Hausa Bibles",
+  "blurb": "Download a translation and show it on its own or side by side.",
+  "body": "<ol><li>Click <b>＋ Bibles</b> in the top bar.</li>\n  <li>Click <b>Download</b> next to the translation you want. Each is about 4–5 MB and takes a few seconds.</li>\n  <li>Choose it under <b>Translation</b> to show it on its own, or under <b>Side by side</b> to show it next to English.</li></ol>\n  <p class=\"tip\">Once downloaded, translations work offline and appear on members’ phones too, with book names in their own language.</p>"
+ },
+ {
+  "slug": "songs",
+  "category": "Worship",
+  "minutes": "3 min",
+  "title": "Import your worship songs",
+  "blurb": "Lyrics that follow the singers, and a usage report for your CCLI licence.",
+  "body": "<ol><li>Open the <b>Songs</b> tab.</li>\n  <li>Paste the lyrics: the title on the first line, then each part separated by a blank line. You can head parts “Verse 1”, “Chorus” and so on. Or import .txt files.</li>\n  <li>Make sure <b>Lyrics</b> is switched on in the top bar.</li>\n  <li>While you listen, the song being sung shows up as a card, and its sections follow the singers.</li></ol>\n  <p class=\"tip\">Hearken includes no lyrics. Import only songs your church is licensed to project. The <b>CCLI report</b> at the bottom of the Songs tab lists what you used.</p>"
+ }
+]

@@ -1,0 +1,12 @@
+{
+  "name": "hearken-site",
+  "private": true,
+  "type": "module",
+  "description": "The Hearken Studio website",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "node build.mjs",
+    "build:offline": "node build.mjs --offline",
+    "dev": "node build.mjs && node scripts/serve.mjs"
+  }
+}
