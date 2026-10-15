@@ -4,8 +4,9 @@
 //
 // Signs with ~/.hearken/licence-signing-key.pem (or LICENCE_SIGNING_KEY), prints the key, and
 // records it in ~/.hearken/licences.jsonl. With --email, it's also attached to that account, so
-// the app picks it up when it next signs in or renews (needs the storage settings: run
-// `npx vercel env pull .env.local` once first).
+// the app picks it up when it next signs in or renews. That needs the database's REST URL and
+// token in .env.local (KV_REST_API_URL, KV_REST_API_TOKEN), copied from the Upstash console:
+// Vercel keeps them sensitive, so `vercel env pull` can't fetch them.
 import { appendFileSync, readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { homedir } from "node:os";

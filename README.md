@@ -71,7 +71,7 @@ Until payments issue keys automatically:
 npm run licence -- --church "Grace Chapel" --months 12
 ```
 
-This prints the key to email to the church and records it in `~/.hearken/licences.jsonl`.
+This prints the key to email to the church and records it in `~/.hearken/licences.jsonl`. Add `--email media@grace.org` to attach it to that church's account, so the app picks it up by itself. That needs the database's `KV_REST_API_URL` and `KV_REST_API_TOKEN` in `.env.local` (git-ignored), copied from the Upstash console. Vercel stores them as sensitive, so `vercel env pull` can't fetch them.
 
 `npm test` runs the endpoint tests. `node scripts/local-api.mjs` runs the API on this computer with an in-memory store, for testing the app against it (`HEARKEN_API=http://localhost:4400/api`).
 
