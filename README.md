@@ -50,11 +50,18 @@ The app's free trial and licence keys are passes signed with an Ed25519 key. The
 |---|---|
 | `POST /api/trial` | Registers a computer's trial the first time it's online, by an anonymous ID the app makes, and signs its dates. A reinstall on the same computer gets the dates first registered. |
 | `GET /api/time?nonce=…` | The website's clock, signed, so the app can tell a wrong date from one turned back. |
+| `POST /api/auth/signup`, `/login` | Creates the church's account or signs in on a computer: returns a session, a signed sign-in pass valid offline for 30 days, and the account's licence. |
+| `POST /api/auth/refresh` | Renews the sign-in pass and fetches the licence (the app does this whenever it's online). |
+| `POST /api/auth/logout` | Ends a computer's session. |
+| `POST /api/auth/forgot`, `/reset` | Emails a link to `/reset` (valid an hour); a new password signs every computer out. |
+
+Passwords are hashed with scrypt; sessions are stored only as hashes; sign-in and reset attempts are rate-limited.
 
 What they need on Vercel:
 
 - **`LICENCE_SIGNING_KEY`**: the private key (PKCS#8 PEM), as a sensitive environment variable. The original is in `~/.hearken/licence-signing-key.pem` on the computer that created it. **Back it up in a password manager.** If it's lost, keys can't be issued for the apps already installed. If it leaks, anyone can make licence keys.
-- **Upstash Redis** from the Storage tab (it sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`), to remember each computer's trial. Without it, `/api/trial` answers 503 and the app keeps its offline trial.
+- **`RESEND_API_KEY`** and **`EMAIL_FROM`** (for example `Hearken Studio <accounts@yourdomain>`): password-reset emails, sent through [Resend](https://resend.com) from a domain you've verified there. Without them, "Forgot your password?" answers that the service isn't available.
+- **Upstash Redis** from the Storage tab (it sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`), to remember accounts, sessions and each computer's trial. **Sign-in doesn't work without it**, and `/api/trial` answers 503 (the app keeps its offline trial).
 
 ### Issuing a licence by hand
 
@@ -66,7 +73,7 @@ npm run licence -- --church "Grace Chapel" --months 12
 
 This prints the key to email to the church and records it in `~/.hearken/licences.jsonl`.
 
-`npm test` runs the endpoint tests.
+`npm test` runs the endpoint tests. `node scripts/local-api.mjs` runs the API on this computer with an in-memory store, for testing the app against it (`HEARKEN_API=http://localhost:4400/api`).
 
 ## Deploying
 

@@ -200,6 +200,41 @@ async function changelogPage(releases) {
   });
 }
 
+/** Where the "reset your password" email leads. */
+function resetPage() {
+  return page({
+    title: "Reset your password · Hearken Studio",
+    current: "",
+    description: "Choose a new password for your Hearken Studio account.",
+    body: `<div class="wrap narrow"><header class="head"><p class="eyebrow">Account</p><h1>Choose a new password.</h1>
+<p class="lede">After this, every computer is signed out. Sign in again in the app with your new password.</p></header>
+<form class="reset" id="reset">
+<label for="pw">New password</label><input id="pw" type="password" autocomplete="new-password" minlength="8" required>
+<label for="pw2">Type it again</label><input id="pw2" type="password" autocomplete="new-password" minlength="8" required>
+<button class="btn" type="submit">Save new password</button>
+<p class="msg" role="status" id="msg"></p></form></div>
+<script>
+const form = document.getElementById("reset"), msg = document.getElementById("msg");
+const token = new URLSearchParams(location.search).get("token");
+if (!token) msg.textContent = "This link isn’t complete. Open it again from the email.";
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const pw = form.pw.value;
+  if (pw !== form.pw2.value) return (msg.textContent = "The two passwords don’t match.");
+  msg.textContent = "Saving…";
+  try {
+    const res = await fetch("/api/auth/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, password: pw }) });
+    const body = await res.json();
+    if (!res.ok) return (msg.textContent = body.error ?? "That didn’t work. Try again.");
+    form.replaceChildren(Object.assign(document.createElement("p"), { className: "lede", textContent: "Your password has been changed. Sign in again in the app." }));
+  } catch {
+    msg.textContent = "Couldn’t reach the server. Check your connection and try again.";
+  }
+});
+</script>`,
+  });
+}
+
 function supportPage(faq) {
   return page({
     title: "Support · Hearken Studio",
@@ -227,6 +262,7 @@ const files = {
   ...blogPages(guides),
   "changelog.html": await changelogPage(releases),
   "support.html": supportPage(faq),
+  "reset.html": resetPage(),
 };
 
 await rm(OUT, { recursive: true, force: true });

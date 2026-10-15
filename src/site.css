@@ -75,3 +75,9 @@ footer em { font: italic 400 18px/1.4 var(--scripture); color: var(--soft); }
 .rel p { color: var(--soft); font-size: 15px; }
 .rel a, .article a { color: var(--gold-pale); }
 code { font: 500 13px/1 ui-monospace, "SF Mono", Menlo, monospace; padding: 2px 5px; border-radius: 5px; background: rgba(255,255,255,.07); }
+.reset { display: grid; gap: 10px; max-width: 420px; }
+.reset label { font: 600 14px/1 var(--ui); color: var(--soft); margin-top: 8px; }
+.reset input { font: 400 16px/1 var(--ui); color: var(--ink); background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+.reset input:focus { outline: none; border-color: var(--gold); }
+.reset .btn { justify-self: start; margin-top: 14px; cursor: pointer; }
+.reset .msg { min-height: 1.5em; color: var(--gold-pale); }

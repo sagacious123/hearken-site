@@ -8,7 +8,7 @@
     "build": "node build.mjs",
     "build:offline": "node build.mjs --offline",
     "dev": "node build.mjs && node scripts/serve.mjs",
-    "test": "node --test test/api.test.mjs",
-    "licence": "node scripts/issue-licence.mjs"
+    "test": "node --test test/api.test.mjs test/auth.test.mjs",
+    "licence": "node --env-file-if-exists=.env.local scripts/issue-licence.mjs"
   }
 }

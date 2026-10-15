@@ -4,12 +4,16 @@
   "a": "Hearken Studio is free for your first two months, with every feature and no card needed. Paid plans will be announced before your trial ends."
  },
  {
+  "q": "Do we need an account?",
+  "a": "Yes. Create one in the app with your church's name, an email and a password, then sign in on each computer you use. Forgot the password? Choose “Forgot your password?” when signing in and we'll email you a link."
+ },
+ {
   "q": "Do we still need someone at the media desk?",
   "a": "Yes, and their job gets easier. Hearken suggests; the operator decides. Only references it’s very sure of can go up by themselves, and only if you turn that on."
  },
  {
   "q": "Does it need the internet?",
-  "a": "No. Listening and recognition run on the laptop. You need a connection only to download the app, register your free trial once (with an anonymous ID for the computer; nothing about your services is sent), add a translation, or update."
+  "a": "Not during services. Listening and recognition run on the laptop. You need a connection to download the app, sign in (then at least once every 30 days, which happens by itself whenever the laptop is online), add a translation, or update. Nothing about your services is sent."
  },
  {
   "q": "What computer do we need?",
