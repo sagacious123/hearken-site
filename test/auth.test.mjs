@@ -5,9 +5,9 @@ import { generateKeyPairSync } from "node:crypto";
 
 process.env.LICENCE_SIGNING_KEY = generateKeyPairSync("ed25519").privateKey.export({ type: "pkcs8", format: "pem" });
 const sent = [];
-process.env.RESEND_API_KEY = "test";
-process.env.EMAIL_FROM = "Hearken <test@example.com>";
+process.env.MAILER_SECRET_KEY = "test";
 globalThis.fetch = async (url, opts) => {
+  assert.equal(opts.headers["x-sdk-key"], "test");
   sent.push(JSON.parse(opts.body));
   return { ok: true, text: async () => "" };
 };
@@ -90,7 +90,9 @@ test("a password reset works once and signs every computer out", async () => {
   assert.equal((await call("forgot", { email: "media@grace.org" }, store)).code, 200);
   assert.equal((await call("forgot", { email: "nobody@grace.org" }, store)).code, 200, "same answer for unknown emails");
   assert.equal(sent.length, 1);
-  const token = sent[0].text.match(/token=([\w-]+)/)[1];
+  assert.equal(sent[0].template, "password-reset");
+  assert.equal(sent[0].to, "media@grace.org");
+  const token = sent[0].data.url.match(/token=([\w-]+)/)[1];
 
   assert.equal((await call("reset", { token, password: "new password" }, store)).code, 200);
   assert.equal((await call("reset", { token, password: "again password" }, store)).code, 400, "links work once");

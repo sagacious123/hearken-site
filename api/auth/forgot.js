@@ -19,11 +19,7 @@ export default post(async (req, res, store) => {
     const token = newToken();
     await store(["SET", `reset:${sha256(token)}`, user.email, "EX", 3600]);
     const link = `${SITE}/reset?token=${token}`;
-    await sendEmail({
-      to: user.email,
-      subject: "Reset your Hearken Studio password",
-      text: `Someone asked to reset the password for ${user.church}'s Hearken Studio account.\n\nTo choose a new password, open this link within an hour:\n${link}\n\nIf it wasn't you, ignore this email: your password hasn't changed.`,
-    });
+    await sendEmail({ to: user.email, template: "password-reset", data: { url: link, expiresInMinutes: 60 } });
   }
   return res.status(200).json({ ok: true });
 });

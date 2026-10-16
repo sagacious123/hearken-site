@@ -60,7 +60,7 @@ Passwords are hashed with scrypt; sessions are stored only as hashes; sign-in an
 What they need on Vercel:
 
 - **`LICENCE_SIGNING_KEY`**: the private key (PKCS#8 PEM), as a sensitive environment variable. The original is in `~/.hearken/licence-signing-key.pem` on the computer that created it. **Back it up in a password manager.** If it's lost, keys can't be issued for the apps already installed. If it leaks, anyone can make licence keys.
-- **`RESEND_API_KEY`** and **`EMAIL_FROM`** (for example `Hearken Studio <accounts@yourdomain>`): password-reset emails, sent through [Resend](https://resend.com) from a domain you've verified there. Without them, "Forgot your password?" answers that the service isn't available.
+- **`MAILER_SECRET_KEY`**: one of the backend keys (`MAILER_SECRET_KEYS`) of Hearken's mailer, [hearken-mailer](https://hearken-mailer.vercel.app), which sends the password-reset emails over SMTP with its branded template. `MAILER_URL` points at another copy of it (default `https://hearken-mailer.vercel.app/api/send`). Without the key, "Forgot your password?" answers that the service isn't available.
 - **Upstash Redis** from the Storage tab (it sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`), to remember accounts, sessions and each computer's trial. **Sign-in doesn't work without it**, and `/api/trial` answers 503 (the app keeps its offline trial).
 
 ### Issuing a licence by hand
