@@ -138,8 +138,8 @@ section.flow { position: relative; z-index: 1; padding-block: clamp(90px, 13vw, 
 .kinds { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .kinds span { font: 600 13px/1 var(--ui); padding: 9px 12px; border-radius: 999px; background: rgba(3,20,28,.75); border: 1px solid rgba(89,207,224,.3); color: #c9f4fb; }
 
-/* IV. the still small voice (plays once when it arrives) */
-#voice .seq { display: grid; gap: 6px; font: 400 clamp(24px, 3.2vw, 42px)/1.15 var(--epic); }
+/* IV. through the noise (plays once when it arrives) */
+#voice .seq { display: grid; gap: 8px; font: 400 clamp(20px, 2.3vw, 30px)/1.2 var(--epic); }
 #voice .seq span { opacity: .22; color: var(--dim); transition: opacity .5s, color .5s, letter-spacing .7s, text-shadow .5s; }
 #voice .seq span.on { opacity: 1; }
 #voice .seq .wind.on { color: #bcd3e6; letter-spacing: .1em; }
@@ -368,16 +368,16 @@ footer em { font: italic 400 19px/1.4 var(--scripture); color: var(--soft); }
     </div>
   </section>
 
-  <!-- IV. The still small voice: accuracy and following -->
+  <!-- IV. Through the noise: accuracy and following -->
   <section class="flow" id="voice" data-bg="#090b10" data-fx="voice">
     <div class="wrap">
       <div class="split">
         <div class="stack">
-          <p class="eyebrow">Chapter IV · The still small voice</p>
-          <div class="seq" aria-label="Not in the wind, not in the earthquake, not in the fire: a still small voice">
-            <span class="wind">Not in the wind.</span><span class="quake">Not in the earthquake.</span><span class="fire">Not in the fire.</span><span class="still">A still small voice.</span>
+          <p class="eyebrow">Chapter IV · Through the noise</p>
+          <div class="seq" aria-label="Over the echo, over the drums and the amens, over a preacher on fire: Hearken hears the verse">
+            <span class="wind">Over the echo.</span><span class="quake">Over the drums and the amens.</span><span class="fire">Over a preacher on fire.</span><span class="still">Hearken hears the verse.</span>
           </div>
-          <p class="lede rv">Pulpits are loud, fast and full of accents. Hearken listens for <b>what was meant</b>: misheard book names, run-together numbers, and verses put in the preacher’s own words.</p>
+          <p class="lede rv">A real service is loud, fast and full of accents. Hearken still finds the right passage when a book name is misheard, numbers run together, or the preacher quotes a verse in their own words.</p>
         </div>
         <div class="meant rv d1">
           <div><q>Exodos twenty</q><i>→</i><b>Exodus 20<small>misheard name</small></b></div>
@@ -622,7 +622,7 @@ footer em { font: italic 400 19px/1.4 var(--scripture); color: var(--soft); }
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -12% 0px" });
   document.querySelectorAll(".rv").forEach((el) => io.observe(el));
 
-  /* the still small voice plays once when you reach it */
+  /* the noise sequence plays once when you reach it */
   const voice = document.getElementById("voice");
   const seq = [...voice.querySelectorAll(".seq span")];
   let played = false, calmAt = 0;
