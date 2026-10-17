@@ -5,7 +5,7 @@
 //   node build.mjs --offline  build from content/releases.json only
 
 import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 const REPO = "Sagacious123/hearken-studio";
 const GH = `https://github.com/${REPO}`;
@@ -116,6 +116,7 @@ const LOGO =
 const NAV = [
   ["Features", "/#features"],
   ["Pricing", "/#pricing"],
+  ["Manual", "/manual"],
   ["Support", "/support"],
   ["Blog", "/blog"],
   ["Changelog", "/changelog"],
@@ -165,6 +166,44 @@ function blogPages(guides) {
     });
   }
   return files;
+}
+
+/** The user manual: content/manual.html, with the contents built from its h2 and h3 headings. */
+async function manualPage() {
+  // Screenshots are taken at 2x: give each its size in CSS pixels, read from the PNG header.
+  const doc = (await readFile("content/manual.html", "utf8")).replace(/<img src="\/(img\/manual\/[\w-]+\.png)"/g, (tag, path) => {
+    const png = readFileSync(`src/${path}`);
+    return `${tag} width="${png.readUInt32BE(16) / 2}" height="${png.readUInt32BE(20) / 2}"`;
+  });
+  const toc = [];
+  for (const m of doc.matchAll(/<h([23]) id="([\w-]+)">([\s\S]*?)<\/h\1>/g)) {
+    const title = m[3].replace(/<span class="n">[\s\S]*?<\/span>/, "").replace(/<[^>]+>/g, "").trim();
+    if (m[1] === "2") toc.push({ id: m[2], title, subs: [] });
+    else toc.at(-1)?.subs.push({ id: m[2], title });
+  }
+  const list = toc
+    .map((c) => `<li><a href="#${c.id}">${c.title}</a>${c.subs.length ? `<ol>${c.subs.map((s) => `<li><a href="#${s.id}">${s.title}</a></li>`).join("")}</ol>` : ""}</li>`)
+    .join("");
+  return page({
+    title: "User manual · Hearken Studio",
+    current: "Manual",
+    description: "How to use Hearken Studio, step by step: setting up, listening, putting scripture and songs on screen, phones, livestreams and every setting.",
+    body: `<div class="manual"><header class="head"><p class="eyebrow">User manual</p><h1>Everything Hearken does, step by step.</h1>
+<p class="lede">From the first install to the end of the service. Read it in order the first time, then come back to any section from the contents.</p></header>
+<details class="toc" open><summary>Contents</summary><nav aria-label="Manual contents"><ol>${list}</ol></nav></details>
+<article class="doc">${doc}</article></div>
+<script>
+// On a phone the contents start folded; the section being read is marked in the contents.
+if (matchMedia("(max-width: 900px)").matches) document.querySelector(".toc").open = false;
+const links = new Map([...document.querySelectorAll(".toc a")].map((a) => [a.hash.slice(1), a]));
+const seen = new IntersectionObserver((es) => es.forEach((e) => {
+  if (!e.isIntersecting) return;
+  links.forEach((a) => a.classList.remove("on"));
+  links.get(e.target.id)?.classList.add("on");
+}), { rootMargin: "-90px 0px -70% 0px" });
+document.querySelectorAll(".doc h2[id], .doc h3[id]").forEach((h) => seen.observe(h));
+</script>`,
+  });
 }
 
 async function changelogPage(releases) {
@@ -245,6 +284,7 @@ function supportPage(faq) {
 <div class="split"><div class="faq">${faq.map(({ q, a }) => `<details><summary>${q}</summary><p>${a}</p></details>`).join("")}</div>
 <aside class="side"><h2>STILL STUCK?</h2>
 <a class="card" href="${GH}/issues" target="_blank" rel="noopener"><h3>Report a problem →</h3><p>Open an issue on GitHub with what happened and what you expected. Screenshots help.</p></a>
+<a class="card" href="/manual"><h3>Read the manual →</h3><p>Every feature, step by step, with screenshots.</p></a>
 <a class="card" href="/blog"><h3>Read the guides →</h3><p>Step-by-step articles for the sound, screens, phones and the remote.</p></a>
 <a class="card" href="/changelog"><h3>See what’s changed →</h3><p>Your problem may already be fixed in a newer version.</p></a></aside></div></div>`,
   });
@@ -262,6 +302,7 @@ const files = {
   ...blogPages(guides),
   "changelog.html": await changelogPage(releases),
   "support.html": supportPage(faq),
+  "manual.html": await manualPage(),
   "reset.html": resetPage(),
 };
 
