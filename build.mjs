@@ -133,10 +133,21 @@ function page({ title, current, description, body }) {
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;1,400&family=Manrope:wght@200;300;400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="/site.css"></head>
 <body>
-<nav class="top" aria-label="Main"><a class="brand" href="/">${LOGO}HEARKEN</a><div class="links">${links}</div><div class="right"><a class="go" href="/#download">Start free trial</a></div></nav>
+<nav class="top" aria-label="Main"><a class="brand" href="/">${LOGO}HEARKEN</a><div class="links" id="site-links">${links}</div><div class="right"><a class="go" href="/#download">Start free trial</a><button class="menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-links"><span></span><span></span><span></span></button></div></nav>
 <main>${body}</main>
 <footer><em>“Thy word is a lamp unto my feet, and a light unto my path.” Psalm 119:105</em>
 <span>${NAV.map(([n, h]) => `<a href="${h}">${n}</a>`).join(" · ")} · <a href="${GH}">GitHub</a></span></footer>
+<script>
+// The phone menu: the button opens the links; a link, Esc or a tap elsewhere closes them.
+(() => {
+  const nav = document.querySelector(".top"), button = nav.querySelector(".menu");
+  const set = (open) => { nav.classList.toggle("open", open); button.setAttribute("aria-expanded", open); };
+  button.addEventListener("click", () => set(!nav.classList.contains("open")));
+  nav.querySelectorAll(".links a").forEach((a) => a.addEventListener("click", () => set(false)));
+  addEventListener("keydown", (e) => e.key === "Escape" && set(false));
+  addEventListener("click", (e) => !nav.contains(e.target) && set(false));
+})();
+</script>
 </body></html>
 `;
 }

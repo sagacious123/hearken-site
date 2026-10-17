@@ -43,6 +43,21 @@ h1, h2, h3, p { margin: 0; }
 .top .go { text-decoration: none; font: 700 14px/1 var(--ui); padding: 11px 16px; border-radius: 7px; color: #1d1200; background: var(--gold); white-space: nowrap; }
 .top .go:hover { background: var(--gold-pale); }
 @media (max-width: 860px) { .top { grid-template-columns: 1fr auto; } .top .links { display: none; } }
+/* On phones the links fold into a menu button. */
+.menu { display: none; width: 44px; height: 44px; padding: 0; border-radius: 9px; border: 1px solid rgba(255,255,255,.16); background: transparent; color: var(--ink); cursor: pointer; place-content: center; gap: 5px; }
+.menu span { display: block; width: 18px; height: 1.5px; border-radius: 2px; background: currentColor; transition: transform .2s, opacity .2s; }
+.top.open .menu span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.top.open .menu span:nth-child(2) { opacity: 0; }
+.top.open .menu span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+@media (max-width: 860px) {
+  .menu { display: grid; }
+  .top.open .links { display: flex; position: absolute; top: calc(100% + 8px); left: 0; right: 0; flex-direction: column; gap: 2px; padding: 8px; border-radius: 14px; background: rgba(14,11,20,.97); border: 1px solid rgba(255,255,255,.1); box-shadow: 0 20px 50px -12px rgba(0,0,0,.8); font: 500 16px/1 var(--ui); }
+  .top.open .links a { padding: 15px 16px; border-radius: 9px; color: var(--ink); box-shadow: none; }
+  .top.open .links a:hover, .top.open .links a[aria-current] { background: rgba(233,178,76,.08); color: var(--gold-pale); }
+}
+@media (max-width: 400px) { .top { gap: 8px; padding: 12px 12px 12px 16px; } .top .brand { font-size: 15px; letter-spacing: .1em; gap: 8px; } .top .brand svg { width: 22px; height: 22px; } .top .right { gap: 8px; } .top .go { padding: 10px 11px; font-size: 12.5px; } .menu { width: 40px; height: 40px; } }
+@media (max-width: 340px) { .top .brand { font-size: 0; gap: 0; } }
+
 
 .wrap { width: min(1180px, 100%); margin: 0 auto; padding-inline: clamp(16px, 5vw, 48px); }
 .eyebrow { font: 600 12px/1 var(--epic); letter-spacing: .3em; text-transform: uppercase; color: var(--gold); }
@@ -295,9 +310,20 @@ footer em { font: italic 400 19px/1.4 var(--scripture); color: var(--soft); }
     <svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="hk-gold" gradientUnits="userSpaceOnUse" x1="30" y1="6" x2="70" y2="94"><stop offset="0" stop-color="#fbe7b5"/><stop offset=".48" stop-color="#e9b24c"/><stop offset="1" stop-color="#b07a24"/></linearGradient></defs><g fill="url(#hk-gold)"><path d="M11 10H39V14.5C35 14.5 33 16.5 33 20.5V79.5C33 83.5 35 85.5 39 85.5V90H11V85.5C15 85.5 17 83.5 17 79.5V20.5C17 16.5 15 14.5 11 14.5Z"/><path d="M61 10H89V14.5C85 14.5 83 16.5 83 20.5V79.5C83 83.5 85 85.5 89 85.5V90H61V85.5C65 85.5 67 83.5 67 79.5V20.5C67 16.5 65 14.5 61 14.5Z"/><circle cx="50" cy="38.5" r="7.75"/><circle cx="50" cy="61.5" r="7.75"/></g></svg>
     HEARKEN
   </a>
-  <div class="links"><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="/manual">Manual</a><a href="/support">Support</a><a href="/blog">Blog</a><a href="/changelog">Changelog</a></div>
-  <div class="right"><a class="go" href="#download">Start free trial</a></div>
+  <div class="links" id="site-links"><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="/manual">Manual</a><a href="/support">Support</a><a href="/blog">Blog</a><a href="/changelog">Changelog</a></div>
+  <div class="right"><a class="go" href="#download">Start free trial</a><button class="menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-links"><span></span><span></span><span></span></button></div>
 </nav>
+<script>
+// The phone menu: the button opens the links; a link, Esc or a tap elsewhere closes them.
+(() => {
+  const nav = document.querySelector(".top"), button = nav.querySelector(".menu");
+  const set = (open) => { nav.classList.toggle("open", open); button.setAttribute("aria-expanded", open); };
+  button.addEventListener("click", () => set(!nav.classList.contains("open")));
+  nav.querySelectorAll(".links a").forEach((a) => a.addEventListener("click", () => set(false)));
+  addEventListener("keydown", (e) => e.key === "Escape" && set(false));
+  addEventListener("click", (e) => !nav.contains(e.target) && set(false));
+})();
+</script>
 
 <main>
   <!-- I. Let there be light (pinned) -->
