@@ -140,5 +140,10 @@ code { font: 500 13px/1 ui-monospace, "SF Mono", Menlo, monospace; padding: 2px 
   .top.open .links a { padding: 15px 16px; border-radius: 9px; color: var(--ink); box-shadow: none; }
   .top.open .links a:hover, .top.open .links a[aria-current] { background: rgba(233,178,76,.08); color: var(--gold-pale); }
 }
-@media (max-width: 400px) { .top { gap: 8px; padding: 12px 12px 12px 16px; } .top .brand { font-size: 15px; letter-spacing: .1em; gap: 8px; } .top .brand svg { width: 22px; height: 22px; } .top .right { gap: 8px; } .top .go { padding: 10px 11px; font-size: 12.5px; } .menu { width: 40px; height: 40px; } }
-@media (max-width: 340px) { .top .brand { font-size: 0; gap: 0; } }
+@media (max-width: 400px) { .top { gap: 8px; padding: 12px 12px 12px 16px; } .top .brand { font-size: 15px; letter-spacing: .1em; gap: 8px; } .top .brand svg { width: 22px; height: 22px; } .top .right { gap: 8px; } .menu { width: 40px; height: 40px; } }
+.links .links-go { display: none; }
+@media (max-width: 860px) {
+  .top .right > .go { display: none; }
+  .top.open .links .links-go { display: block; margin-top: 6px; padding: 15px 16px; border-radius: 9px; text-align: center; font: 700 15px/1 var(--ui); color: #1d1200; background: var(--gold); }
+  .top.open .links .links-go:hover { background: var(--gold-pale); color: #1d1200; }
+}
