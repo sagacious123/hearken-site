@@ -1,0 +1,24 @@
+/* The footer on every page (built by footer() in build.mjs): the brand, three columns of
+   links, and a bottom line. Colours are written out so it looks the same on every page. */
+.site-foot { position: relative; z-index: 1; border-top: 1px solid rgba(255,255,255,.09); background: linear-gradient(180deg, rgba(14,11,21,.6), #07050c 60%); color: #a99f8f; font: 400 14.5px/1.6 "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif; }
+.foot-grid { width: min(1180px, 100%); margin: 0 auto; padding: 56px clamp(16px, 5vw, 48px) 36px; display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)); gap: 40px; }
+.foot-brand { display: grid; gap: 16px; align-content: start; max-width: 340px; }
+.foot-logo { display: inline-flex; align-items: center; gap: 10px; justify-self: start; text-decoration: none; color: #f4ede1; font: 600 18px/1 "Cinzel", "Times New Roman", serif; letter-spacing: .14em; }
+.foot-logo svg { width: 26px; height: 26px; }
+.foot-brand p { margin: 0; color: #a99f8f; }
+.foot-cta { justify-self: start; display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(233,178,76,.5); color: #f8e0a4; font: 700 13.5px/1 "Manrope", system-ui, sans-serif; text-decoration: none; transition: background .2s, border-color .2s; }
+.foot-cta:hover { background: rgba(233,178,76,.1); border-color: #e9b24c; }
+.site-foot nav h2 { margin: 0 0 14px; font: 600 12px/1 "Cinzel", "Times New Roman", serif; letter-spacing: .24em; text-transform: uppercase; color: #e9b24c; }
+.site-foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.site-foot nav a { color: #cbc1b0; text-decoration: none; }
+.site-foot nav a:hover { color: #f4ede1; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(233,178,76,.6); }
+.foot-base { width: min(1180px, 100%); margin: 0 auto; padding: 20px clamp(16px, 5vw, 48px) 36px; display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; border-top: 1px solid rgba(255,255,255,.07); font-size: 13px; color: #8c8373; }
+.foot-base a { margin-left: auto; color: #a99f8f; text-decoration: none; }
+.foot-base a:hover { color: #f4ede1; }
+@media (max-width: 860px) {
+  .foot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; padding-top: 44px; }
+  .foot-brand { grid-column: 1 / -1; max-width: none; }
+}
+@media (max-width: 420px) {
+  .foot-base a { margin-left: 0; }
+}

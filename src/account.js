@@ -162,8 +162,19 @@
     $("in").hidden = !a;
     $("out").hidden = !!a;
     if (a) render(a);
-    else mode(false);
+    else openFromAddress();
   }
+
+  /** /account#create opens the sign-up form, /account#forgot the reset form (footer links). */
+  function openFromAddress() {
+    if ($("out").hidden) return;
+    $("forgot").hidden = true;
+    $("verify").hidden = true;
+    $("auth").hidden = false;
+    mode(location.hash === "#create");
+    if (location.hash === "#forgot") $("to-forgot").click();
+  }
+  addEventListener("hashchange", openFromAddress);
 
   $("confirm-send").onclick = () =>
     busy($("confirm-msg"), async () => {

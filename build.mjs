@@ -113,6 +113,25 @@ const PLACEHOLDER = /^See the assets below to download/;
 const LOGO =
   '<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="hk-gold" gradientUnits="userSpaceOnUse" x1="30" y1="6" x2="70" y2="94"><stop offset="0" stop-color="#fbe7b5"/><stop offset=".48" stop-color="#e9b24c"/><stop offset="1" stop-color="#b07a24"/></linearGradient></defs><g fill="url(#hk-gold)"><path d="M11 10H39V14.5C35 14.5 33 16.5 33 20.5V79.5C33 83.5 35 85.5 39 85.5V90H11V85.5C15 85.5 17 83.5 17 79.5V20.5C17 16.5 15 14.5 11 14.5Z"/><path d="M61 10H89V14.5C85 14.5 83 16.5 83 20.5V79.5C83 83.5 85 85.5 89 85.5V90H61V85.5C65 85.5 67 83.5 67 79.5V20.5C67 16.5 65 14.5 61 14.5Z"/><circle cx="50" cy="38.5" r="7.75"/><circle cx="50" cy="61.5" r="7.75"/></g></svg>';
 
+/** The footer on every page: the brand, three columns of links, and a bottom line. */
+function footer() {
+  const col = (title, links) =>
+    `<nav aria-label="${title}"><h2>${title}</h2><ul>${links.map(([name, href]) => `<li><a href="${href}">${name}</a></li>`).join("")}</ul></nav>`;
+  return `<footer class="site-foot">
+<div class="foot-grid">
+<div class="foot-brand">
+<a class="foot-logo" href="/" aria-label="Hearken Studio home">${LOGO.replaceAll("hk-gold", "hk-gold-foot")}<span>HEARKEN</span></a>
+<p>Scripture on the screen the moment it’s said. Listens to the sermon, works offline, and serves every member in their own language.</p>
+<a class="foot-cta" href="/#download">Download for Mac, Windows or Linux</a>
+</div>
+${col("Product", [["Features", "/#features"], ["Pricing", "/#pricing"], ["Download", "/#download"], ["Changelog", "/changelog"]])}
+${col("Help", [["User manual", "/manual"], ["Guides", "/blog"], ["Support", "/support"], ["Privacy", "/manual#data"]])}
+${col("Account", [["Sign in", "/account"], ["Create an account", "/account#create"], ["Reset your password", "/account#forgot"]])}
+</div>
+<div class="foot-base"><span>© ${new Date().getFullYear()} Hearken Studio</span><span>Works offline on Mac, Windows and Linux</span><a href="${GH}">GitHub</a></div>
+</footer>`;
+}
+
 const NAV = [
   ["Features", "/#features"],
   ["Pricing", "/#pricing"],
@@ -132,11 +151,11 @@ function page({ title, current, description, body, head = "" }) {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;1,400&family=Manrope:wght@200;300;400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="/site.css">${head}</head>
+<link rel="stylesheet" href="/site.css"><link rel="stylesheet" href="/footer.css">${head}</head>
 <body>
 <nav class="top" aria-label="Main"><a class="brand" href="/">${LOGO}HEARKEN</a><div class="links" id="site-links">${links}<a class="links-go" href="/#download">Start free trial</a></div><div class="right"><a class="go" href="/#download">Start free trial</a><button class="menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-links"><span></span><span></span><span></span></button></div></nav>
 <main>${body}</main>
-<footer><span>${NAV.map(([n, h]) => `<a href="${h}">${n}</a>`).join(" · ")} · <a href="${GH}">GitHub</a></span></footer>
+${footer()}
 <script>
 // The phone menu: the button opens the links; a link, Esc or a tap elsewhere closes them.
 (() => {
@@ -483,7 +502,7 @@ const guides = JSON.parse(await readFile("content/guides.json", "utf8"));
 const faq = JSON.parse(await readFile("content/faq.json", "utf8"));
 
 const files = {
-  "index.html": fillDownloads(await readFile("src/index.html", "utf8"), releases),
+  "index.html": fillDownloads(await readFile("src/index.html", "utf8"), releases).replace("<!--footer-->", footer()),
   ...blogPages(guides),
   "changelog.html": await changelogPage(releases),
   "support.html": supportPage(faq),

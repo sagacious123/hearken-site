@@ -70,7 +70,6 @@ main { padding-bottom: 90px; }
 @media (max-width: 900px) { .split { grid-template-columns: minmax(0, 1fr); } }
 .side { display: grid; gap: 14px; position: sticky; top: 90px; }
 .side h2 { font: 600 13px/1 var(--epic); letter-spacing: .24em; color: var(--dim); }
-footer { border-top: 1px solid var(--line); padding: 28px 16px 48px; text-align: center; display: grid; gap: 10px; color: var(--dim); font-size: 14px; }
 .rel p { color: var(--soft); font-size: 15px; }
 .rel a, .article a { color: var(--gold-pale); }
 code { font: 500 13px/1 ui-monospace, "SF Mono", Menlo, monospace; padding: 2px 5px; border-radius: 5px; background: rgba(255,255,255,.07); }
