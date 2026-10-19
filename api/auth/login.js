@@ -1,10 +1,13 @@
-// POST /api/auth/login { email, password, machine } → { session, pass, licence }
-import { allowed, body, checkPassword, clientIp, fail, getUser, normalEmail, startSession } from "../../lib/auth.js";
+// POST /api/auth/login { email, password, machine, name?, replace? } → { session, pass, licence }
+//
+// Over the computer limit it answers 409 with the account's computers; signing in again with
+// `replace` set to one of their ids signs that one out.
+import { allowed, body, checkPassword, clientIp, fail, getUser, normalEmail, startSession, TooManyComputers, tooMany } from "../../lib/auth.js";
 import { post } from "../../lib/handler.js";
 import { isHex } from "../../lib/pass.js";
 
 export default post(async (req, res, store) => {
-  const { password, machine } = body(req);
+  const { password, machine, name, replace } = body(req);
   const email = normalEmail(body(req).email);
   if (!email || typeof password !== "string" || !isHex(machine, 64, 64)) return fail(res, 400, "Enter your email and password.");
   const limited = !(await allowed(store, `login:${email}`, 10, 900)) || !(await allowed(store, `login-ip:${clientIp(req)}`, 50, 900));
@@ -12,5 +15,10 @@ export default post(async (req, res, store) => {
 
   const user = await getUser(store, email);
   if (!user || !(await checkPassword(password, user.password))) return fail(res, 401, "Wrong email or password.");
-  return res.status(200).json(await startSession(store, user, machine));
+  try {
+    return res.status(200).json(await startSession(store, user, machine, { name, replace }));
+  } catch (e) {
+    if (e instanceof TooManyComputers) return tooMany(res, e);
+    throw e;
+  }
 });

@@ -10,10 +10,11 @@ export default post(async (req, res, store) => {
   if (!validPassword(password)) return fail(res, 400, "Use a password of at least 8 characters.");
   const email = await store(["GET", `reset:${sha256(token)}`]);
   const user = email && (await getUser(store, email));
-  if (!user) return fail(res, 400, "This link has expired or was already used. Ask for a new one from the app.");
+  if (!user) return fail(res, 400, "This link has expired or was already used. Ask for a new one from the app or the account page.");
   await store(["DEL", `reset:${sha256(token)}`]);
   user.password = await hashPassword(password);
   user.version = (user.version ?? 0) + 1;
   await saveUser(store, user);
+  await store(["DEL", `computers:${user.id}`]);
   return res.status(200).json({ ok: true });
 });

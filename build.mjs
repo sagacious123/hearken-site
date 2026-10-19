@@ -120,9 +120,10 @@ const NAV = [
   ["Support", "/support"],
   ["Blog", "/blog"],
   ["Changelog", "/changelog"],
+  ["Account", "/account"],
 ];
 
-function page({ title, current, description, body }) {
+function page({ title, current, description, body, head = "" }) {
   const links = NAV.map(([name, href]) => `<a href="${href}"${name === current ? ' aria-current="page"' : ""}>${name}</a>`).join("");
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -131,7 +132,7 @@ function page({ title, current, description, body }) {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;1,400&family=Manrope:wght@200;300;400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="/site.css"></head>
+<link rel="stylesheet" href="/site.css">${head}</head>
 <body>
 <nav class="top" aria-label="Main"><a class="brand" href="/">${LOGO}HEARKEN</a><div class="links" id="site-links">${links}<a class="links-go" href="/#download">Start free trial</a></div><div class="right"><a class="go" href="/#download">Start free trial</a><button class="menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-links"><span></span><span></span><span></span></button></div></nav>
 <main>${body}</main>
@@ -250,6 +251,178 @@ async function changelogPage(releases) {
   });
 }
 
+/** The church's account: sign in or create it, then its licence, computers, name and password. */
+function accountPage() {
+  const field = (id, label, type, extra = "") => `<label for="${id}">${label}</label><input id="${id}" name="${id}" type="${type}" ${extra}>`;
+  return page({
+    title: "Account · Hearken Studio",
+    current: "Account",
+    description: "Your church's Hearken Studio account: its licence, the computers signed in, and its password.",
+    body: `<div class="wrap narrow acct">
+<p class="lede" id="loading">Loading…</p>
+<section id="out" hidden>
+<header class="head"><p class="eyebrow">Account</p><h1>Your church’s account.</h1>
+<p class="lede">The same account you use in the app. Sign in to see its computers and licence, or create it here and sign in with it in the app.</p></header>
+<div class="tabs" role="tablist"><button type="button" role="tab" id="tab-in" aria-selected="true">Sign in</button><button type="button" role="tab" id="tab-new" aria-selected="false">Create an account</button></div>
+<form class="form" id="auth" novalidate>
+<div id="church-field" hidden>${field("church", "Church name", "text", 'maxlength="120" autocomplete="organization"')}</div>
+${field("email", "Email", "email", 'autocomplete="email" required')}
+${field("password", "Password", "password", 'autocomplete="current-password" required')}
+<p class="hint" id="pw-hint" hidden>At least 8 characters.</p>
+<button class="btn" type="submit" id="auth-go">Sign in</button>
+<p class="msg" role="status" id="auth-msg"></p>
+<button type="button" class="link" id="to-forgot">Forgot your password?</button>
+</form>
+<form class="form" id="verify" hidden novalidate>
+<p>We emailed a 6-digit code to <b id="verify-email"></b>. Enter it to finish creating the account. It expires in 30 minutes.</p>
+<label for="verify-code">Code</label><input id="verify-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+<button class="btn" type="submit">Create account</button>
+<p class="msg" role="status" id="verify-msg"></p>
+<button type="button" class="link" id="verify-again">Send a new code</button>
+<button type="button" class="link" id="verify-back">Change the details</button>
+</form>
+<form class="form" id="forgot" hidden novalidate>
+<p>We’ll email you a link to choose a new password.</p>
+${field("forgot-email", "Email", "email", 'autocomplete="email" required')}
+<button class="btn" type="submit">Email me a link</button>
+<p class="msg" role="status" id="forgot-msg"></p>
+<button type="button" class="link" id="from-forgot">Back to sign in</button>
+</form>
+</section>
+<section id="in" hidden>
+<header class="head"><p class="eyebrow">Account</p><h1 id="church-name"></h1><p class="lede" id="who"></p></header>
+<div class="panel notice" id="confirm" hidden><h2>Confirm your email</h2>
+<p>This account’s email hasn’t been confirmed yet. We’ll send a code to <b id="confirm-email"></b>, to make sure password resets and licences reach you.</p>
+<form class="form inline" id="confirm-form" novalidate><label class="sr" for="confirm-code">Code</label><input id="confirm-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" hidden><button class="btn" type="button" id="confirm-send">Email me a code</button><button class="btn" type="submit" id="confirm-go" hidden>Confirm</button></form>
+<p class="msg" role="status" id="confirm-msg"></p></div>
+<div class="panel" id="licence"></div>
+<div class="panel"><div class="panel-head"><h2>Computers</h2><span id="count"></span></div>
+<ul class="computers" id="computers"></ul><p class="hint" id="computers-note"></p></div>
+<div class="panel"><h2>Church name</h2><p class="hint">Shown in the app and at the top of sermon recaps.</p>
+<form class="form inline" id="rename" novalidate><label for="new-church" class="sr">Church name</label><input id="new-church" name="new-church" type="text" maxlength="120" autocomplete="organization" required><button class="btn ghost" type="submit">Save</button></form>
+<p class="msg" role="status" id="rename-msg"></p></div>
+<div class="panel"><h2>Password</h2><p class="hint">Computers stay signed in when you change it here. To sign every computer out, use “Forgot your password?” when signed out.</p>
+<form class="form" id="password-form" novalidate>
+${field("current", "Current password", "password", 'autocomplete="current-password" required')}
+${field("next", "New password", "password", 'autocomplete="new-password" minlength="8" required')}
+<button class="btn ghost" type="submit">Change password</button>
+<p class="msg" role="status" id="password-msg"></p></form></div>
+<button type="button" class="btn ghost" id="sign-out">Sign out of this website</button>
+</section>
+</div>
+<script src="/account.js"></script>`,
+  });
+}
+
+/** The admin dashboard: its own layout (a sidebar, not the site's menu), drawn by /admin.js. */
+function adminPage() {
+  const icon = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const ICONS = {
+    overview: icon('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
+    accounts: icon('<path d="M3 21v-1a6 6 0 0 1 12 0v1"/><circle cx="9" cy="8" r="4"/><path d="M17 11a3 3 0 1 0 0-6M21 21v-1a5 5 0 0 0-3-4.6"/>'),
+    computers: icon('<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/>'),
+    trials: icon('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>'),
+    licences: icon('<path d="M15 7a4 4 0 1 1-4 4"/><path d="M11 11 3 19v2h3l1-1v-2h2v-2h2l1.2-1.2"/><circle cx="16.5" cy="7.5" r="1"/>'),
+    security: icon('<path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/>'),
+  };
+  const nav = [["overview", "Overview"], ["accounts", "Accounts"], ["computers", "Computers"], ["trials", "Trials"], ["licences", "Licences"], ["security", "Security"]]
+    .map(([id, label]) => `<a href="#${id}" data-view="${id}">${ICONS[id]}<span>${label}</span></a>`)
+    .join("");
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin · Hearken Studio</title><meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Manrope:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/admin.css"></head>
+<body>
+<div class="gate" id="gate" hidden><div class="gate-card">
+<a class="gate-brand" href="/">${LOGO.replaceAll("hk-gold", "hk-gold-gate")}<span>HEARKEN</span></a>
+<h1>Admin</h1><p id="gate-text">Loading…</p>
+<a class="btn" id="gate-account" href="/account" hidden>Go to the account page</a>
+<form id="code-form" hidden novalidate>
+<div id="by-app" hidden><label for="app-code">The 6-digit code from your authenticator app</label><input id="app-code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
+<div id="by-email" hidden><button class="btn ghost" type="button" id="send-code">Email me a code</button>
+<div id="code-entry" hidden><label for="code">The 6-digit code from your email</label><input id="code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div></div>
+<label class="check" id="trust-row" hidden><input type="checkbox" id="trust"> Trust this browser for 30 days</label>
+<button class="btn" type="submit" id="open" hidden>Open the dashboard</button>
+<button type="button" class="link" id="use-email" hidden>Can’t use your authenticator? Email me a code</button>
+<button type="button" class="link" id="use-app" hidden>Use my authenticator app instead</button>
+<p class="msg" role="status" id="code-msg"></p></form></div></div>
+
+<div class="shell" id="shell" hidden>
+<aside class="sidebar" id="sidebar">
+<a class="side-brand" href="/">${LOGO.replaceAll("hk-gold", "hk-gold-side")}<span>HEARKEN</span><small>Admin</small></a>
+<nav aria-label="Dashboard">${nav}</nav>
+<div class="side-foot"><span class="me" id="me"></span><a href="/">Back to the website</a><button type="button" id="admin-out">Sign out</button></div>
+</aside>
+<div class="scrim" id="scrim"></div>
+<div class="main">
+<header class="topbar"><button class="burger" type="button" id="burger" aria-label="Menu" aria-controls="sidebar" aria-expanded="false"><span></span><span></span><span></span></button>
+<h1 id="title">Overview</h1><span class="updated" id="updated"></span><button class="btn ghost small" type="button" id="refresh">Refresh</button></header>
+<main id="views">
+<section data-view="overview">
+<div class="tiles" id="tiles"></div>
+<div class="grid2"><div class="card"><h2>New accounts per week</h2><div class="bars" id="chart-accounts"></div></div>
+<div class="card"><h2>Trials started per week</h2><div class="bars" id="chart-trials"></div></div></div>
+<div class="grid2"><div class="card"><div class="card-head"><h2>Newest accounts</h2><a href="#accounts">All accounts →</a></div><div class="table"><table><tbody id="recent"></tbody></table></div></div>
+<div class="card"><div class="card-head"><h2>App versions</h2></div><p class="hint">Computers by the version they first ran.</p><ul class="list" id="versions"></ul></div></div>
+</section>
+<section data-view="accounts" hidden>
+<div class="toolbar"><label class="sr" for="q-accounts">Search accounts</label><input class="search" id="q-accounts" type="search" placeholder="Search church or email">
+<div class="chips" id="chips"></div></div>
+<div class="card flush"><div class="table"><table><thead><tr><th>Church</th><th>Email</th><th>Created</th><th>Computers</th><th>Last used</th><th>Status</th></tr></thead><tbody id="accounts"></tbody></table></div></div>
+</section>
+<section data-view="computers" hidden>
+<div class="toolbar"><label class="sr" for="q-computers">Search computers</label><input class="search" id="q-computers" type="search" placeholder="Search computer or church"></div>
+<div class="card flush"><div class="table"><table><thead><tr><th>Computer</th><th>Church</th><th>First signed in</th><th>Last used</th><th>Trial</th></tr></thead><tbody id="computers"></tbody></table></div></div>
+</section>
+<section data-view="trials" hidden>
+<p class="hint">Every computer that has opened Hearken and gone online, signed in or not. A trial lasts 60 days from the first time Hearken opens.</p>
+<div class="card flush"><div class="table"><table><thead><tr><th>Computer</th><th>Church</th><th>Version</th><th>Started</th><th>Ends</th></tr></thead><tbody id="trials"></tbody></table></div></div>
+</section>
+<section data-view="licences" hidden>
+<p class="hint">To issue a licence, open the church from Accounts.</p>
+<div class="card flush"><div class="table"><table><thead><tr><th>Church</th><th>Plan</th><th>Until</th><th>State</th></tr></thead><tbody id="licences"></tbody></table></div></div>
+<div class="card"><h2>Activity</h2><ul class="list" id="log"></ul></div>
+</section>
+<section data-view="security" hidden>
+<div class="card" id="totp-card"><h2>Authenticator app</h2><p id="totp-state"></p>
+<div id="totp-setup" hidden>
+<ol class="steps"><li>Open an authenticator app on your phone (Google Authenticator, Microsoft Authenticator, 1Password…) and add an account by scanning this code.</li>
+<li>Type the 6-digit code it shows, to confirm.</li></ol>
+<div class="qr-row"><div class="qr" id="totp-qr" role="img" aria-label="QR code for your authenticator app"></div>
+<div class="qr-side"><p class="hint">Can’t scan? Enter this key in the app instead:</p><code id="totp-secret"></code></div></div>
+<form class="form inline" id="totp-confirm" novalidate><label class="sr" for="totp-code">Code from the app</label><input id="totp-code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code"><button class="btn" type="submit">Turn on</button></form></div>
+<button class="btn" type="button" id="totp-begin" hidden>Set up an authenticator app</button>
+<form class="form inline" id="totp-remove" hidden novalidate><label class="sr" for="totp-remove-code">Code from the app</label><input id="totp-remove-code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Code from the app"><button class="btn ghost danger" type="submit">Remove it</button></form>
+<p class="msg" role="status" id="totp-msg"></p></div>
+<div class="card"><h2>Staying signed in</h2><p class="hint">Without “Trust this browser”, the dashboard asks again after 12 hours. Trusted browsers skip the second step for 30 days. Signing out here, or out of the account page, ends it straight away.</p></div>
+</section>
+</main></div></div>
+
+<dialog id="detail" aria-labelledby="d-church"><div class="detail">
+<header><div><h2 id="d-church"></h2><p class="hint" id="d-who"></p></div><button class="btn ghost small" type="button" id="d-close">Close</button></header>
+<section><h3>Licence</h3><p id="d-licence"></p>
+<form class="form issue" id="issue" novalidate>
+<label for="i-plan">Plan</label><input id="i-plan" value="standard" maxlength="40">
+<label for="i-length">Length</label><select id="i-length"><option value="m1">1 month</option><option value="m3">3 months</option><option value="m6">6 months</option><option value="m12" selected>12 months</option><option value="d14">14 days</option><option value="d30">30 days</option></select>
+<label class="check"><input type="checkbox" id="i-send" checked> Email the key to the church</label>
+<button class="btn" type="submit">Issue licence</button></form>
+<button class="link danger" type="button" id="d-revoke">Revoke the licence</button>
+<p class="hint">A licence already on a computer keeps working there until its end date: keys work offline, so revoking only stops it reaching more computers.</p></section>
+<section><h3>Computers</h3><ul class="rows" id="d-computers"></ul></section>
+<section><h3>Church name</h3><form class="form inline" id="d-rename" novalidate><label class="sr" for="d-name">Church name</label><input id="d-name" maxlength="120"><button class="btn ghost" type="submit">Save</button></form></section>
+<section><h3>Sign-in</h3><div class="row"><button class="btn ghost small" type="button" id="d-reset">Send a password-reset email</button><button class="btn ghost small" type="button" id="d-signout">Sign out everywhere</button></div></section>
+<section class="danger-zone" id="d-danger"><h3>Delete the account</h3><p class="hint">Removes the account, its licence and its computers’ sign-ins. Trials stay with their computers.</p>
+<form class="form inline" id="d-delete" novalidate><label class="sr" for="d-confirm">Type the account’s email to confirm</label><input id="d-confirm" placeholder="Type the account’s email to confirm"><button class="btn ghost danger" type="submit">Delete</button></form></section>
+<p class="msg" role="status" id="d-msg"></p></div></dialog>
+<script src="/vendor/qrcode.js"></script>
+<script src="/admin.js"></script>
+</body></html>
+`;
+}
+
 /** Where the "reset your password" email leads. */
 function resetPage() {
   return page({
@@ -257,7 +430,7 @@ function resetPage() {
     current: "",
     description: "Choose a new password for your Hearken Studio account.",
     body: `<div class="wrap narrow"><header class="head"><p class="eyebrow">Account</p><h1>Choose a new password.</h1>
-<p class="lede">After this, every computer is signed out. Sign in again in the app with your new password.</p></header>
+<p class="lede">After this, every computer is signed out. Sign in again in the app, or on your <a href="/account">account page</a>, with your new password.</p></header>
 <form class="reset" id="reset">
 <label for="pw">New password</label><input id="pw" type="password" autocomplete="new-password" minlength="8" required>
 <label for="pw2">Type it again</label><input id="pw2" type="password" autocomplete="new-password" minlength="8" required>
@@ -315,6 +488,8 @@ const files = {
   "support.html": supportPage(faq),
   "manual.html": await manualPage(),
   "reset.html": resetPage(),
+  "account.html": accountPage(),
+  "admin.html": adminPage(),
 };
 
 await rm(OUT, { recursive: true, force: true });

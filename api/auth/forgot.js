@@ -3,10 +3,8 @@
 // Emails a link to reset the password, valid for an hour. Answers the same whether or not the
 // account exists, so it can't be used to find out who has one.
 import { allowed, body, clientIp, fail, getUser, newToken, normalEmail, sha256 } from "../../lib/auth.js";
-import { sendEmail } from "../../lib/email.js";
+import { SITE, sendEmail } from "../../lib/email.js";
 import { post } from "../../lib/handler.js";
-
-export const SITE = process.env.SITE_URL ?? "https://hearken-site.vercel.app";
 
 export default post(async (req, res, store) => {
   const email = normalEmail(body(req).email);
