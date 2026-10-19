@@ -237,7 +237,7 @@ async function changelogPage(releases) {
     // Notes written here win; then the release's own notes; then a link to the release.
     const notes = (await local(r.version)) ?? (PLACEHOLDER.test(r.body.trim()) ? "" : r.body);
     const html = notes ? markdown(notes) : `<p><a href="${GH}/releases/tag/v${r.version}">Download and details on GitHub</a></p>`;
-    entries.push(`<div class="rel"><div class="v"><h2>${r.version}</h2><span>${date(r.date)}</span></div>${html}</div>`);
+    entries.push(`<div class="rel" id="v${r.version}"><div class="v"><h2>${r.version}</h2><span>${date(r.date)}</span></div>${html}</div>`);
   }
 
   return page({

@@ -195,3 +195,7 @@ code { font: 500 13px/1 ui-monospace, "SF Mono", Menlo, monospace; padding: 2px 
 .otp input { width: 46px !important; height: 54px; flex: none; padding: 0 !important; text-align: center; font: 600 22px/1 var(--ui) !important; border-radius: 10px !important; caret-color: var(--gold); }
 .otp input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(233,178,76,.18); outline: none; }
 @media (max-width: 380px) { .otp { gap: 6px; } .otp input { width: 40px !important; height: 48px; } }
+
+/* The app's "What's new" link lands on a version: clear of the fixed menu bar. */
+.rel { scroll-margin-top: 110px; }
+.rel:target .v h2 { color: var(--gold-pale); }
