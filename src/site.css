@@ -71,7 +71,6 @@ main { padding-bottom: 90px; }
 .side { display: grid; gap: 14px; position: sticky; top: 90px; }
 .side h2 { font: 600 13px/1 var(--epic); letter-spacing: .24em; color: var(--dim); }
 footer { border-top: 1px solid var(--line); padding: 28px 16px 48px; text-align: center; display: grid; gap: 10px; color: var(--dim); font-size: 14px; }
-footer em { font: italic 400 18px/1.4 var(--scripture); color: var(--soft); }
 .rel p { color: var(--soft); font-size: 15px; }
 .rel a, .article a { color: var(--gold-pale); }
 code { font: 500 13px/1 ui-monospace, "SF Mono", Menlo, monospace; padding: 2px 5px; border-radius: 5px; background: rgba(255,255,255,.07); }
@@ -188,4 +187,11 @@ code { font: 500 13px/1 ui-monospace, "SF Mono", Menlo, monospace; padding: 2px 
 
 .panel.notice { border-color: rgba(233,178,76,.45); background: rgba(233,178,76,.06); }
 .form.inline input[hidden] { display: none; }
-#confirm-form { grid-template-columns: minmax(0, 220px) auto auto; justify-content: start; }
+#confirm-form { grid-template-columns: auto auto auto; justify-content: start; align-items: center; }
+
+/* Six boxes for a 6-digit code (otp.js). */
+.otp-source { display: none !important; }
+.otp { display: flex; gap: 8px; }
+.otp input { width: 46px !important; height: 54px; flex: none; padding: 0 !important; text-align: center; font: 600 22px/1 var(--ui) !important; border-radius: 10px !important; caret-color: var(--gold); }
+.otp input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(233,178,76,.18); outline: none; }
+@media (max-width: 380px) { .otp { gap: 6px; } .otp input { width: 40px !important; height: 48px; } }

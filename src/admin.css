@@ -156,6 +156,13 @@ input.code { font: 600 20px/1 var(--ui); letter-spacing: .3em; width: 190px; }
 .qr svg { width: 180px; height: 180px; }
 .qr-side { display: grid; gap: 6px; max-width: 320px; }
 .qr-side code { font: 600 14px/1.5 ui-monospace, Menlo, monospace; letter-spacing: .08em; color: var(--gold-pale); overflow-wrap: anywhere; }
-#totp-confirm, #totp-remove { grid-template-columns: 200px auto; justify-content: start; }
+#totp-confirm, #totp-remove { grid-template-columns: auto auto; justify-content: start; align-items: center; gap: 12px; }
 input.code::placeholder { letter-spacing: normal; font-size: 14px; font-weight: 500; }
 #totp-setup { display: grid; gap: 14px; }
+
+/* Six boxes for a 6-digit code (otp.js). */
+.otp-source { display: none !important; }
+.otp { display: flex; gap: 8px; }
+.otp input { width: 46px !important; height: 54px; flex: none; padding: 0 !important; text-align: center; font: 600 22px/1 var(--ui) !important; border-radius: 10px !important; caret-color: var(--gold); }
+.otp input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(233,178,76,.18); outline: none; }
+@media (max-width: 380px) { .otp { gap: 6px; } .otp input { width: 40px !important; height: 48px; } }

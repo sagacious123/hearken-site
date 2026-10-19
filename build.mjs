@@ -136,8 +136,7 @@ function page({ title, current, description, body, head = "" }) {
 <body>
 <nav class="top" aria-label="Main"><a class="brand" href="/">${LOGO}HEARKEN</a><div class="links" id="site-links">${links}<a class="links-go" href="/#download">Start free trial</a></div><div class="right"><a class="go" href="/#download">Start free trial</a><button class="menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-links"><span></span><span></span><span></span></button></div></nav>
 <main>${body}</main>
-<footer><em>“Thy word is a lamp unto my feet, and a light unto my path.” Psalm 119:105</em>
-<span>${NAV.map(([n, h]) => `<a href="${h}">${n}</a>`).join(" · ")} · <a href="${GH}">GitHub</a></span></footer>
+<footer><span>${NAV.map(([n, h]) => `<a href="${h}">${n}</a>`).join(" · ")} · <a href="${GH}">GitHub</a></span></footer>
 <script>
 // The phone menu: the button opens the links; a link, Esc or a tap elsewhere closes them.
 (() => {
@@ -275,7 +274,7 @@ ${field("password", "Password", "password", 'autocomplete="current-password" req
 </form>
 <form class="form" id="verify" hidden novalidate>
 <p>We emailed a 6-digit code to <b id="verify-email"></b>. Enter it to finish creating the account. It expires in 30 minutes.</p>
-<label for="verify-code">Code</label><input id="verify-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+<label for="verify-code">Code</label><input id="verify-code" data-otp="submit" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
 <button class="btn" type="submit">Create account</button>
 <p class="msg" role="status" id="verify-msg"></p>
 <button type="button" class="link" id="verify-again">Send a new code</button>
@@ -293,7 +292,7 @@ ${field("forgot-email", "Email", "email", 'autocomplete="email" required')}
 <header class="head"><p class="eyebrow">Account</p><h1 id="church-name"></h1><p class="lede" id="who"></p></header>
 <div class="panel notice" id="confirm" hidden><h2>Confirm your email</h2>
 <p>This account’s email hasn’t been confirmed yet. We’ll send a code to <b id="confirm-email"></b>, to make sure password resets and licences reach you.</p>
-<form class="form inline" id="confirm-form" novalidate><label class="sr" for="confirm-code">Code</label><input id="confirm-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" hidden><button class="btn" type="button" id="confirm-send">Email me a code</button><button class="btn" type="submit" id="confirm-go" hidden>Confirm</button></form>
+<form class="form inline" id="confirm-form" novalidate><label class="sr" for="confirm-code">Code</label><input id="confirm-code" data-otp="submit" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" hidden><button class="btn" type="button" id="confirm-send">Email me a code</button><button class="btn" type="submit" id="confirm-go" hidden>Confirm</button></form>
 <p class="msg" role="status" id="confirm-msg"></p></div>
 <div class="panel" id="licence"></div>
 <div class="panel"><div class="panel-head"><h2>Computers</h2><span id="count"></span></div>
@@ -310,6 +309,7 @@ ${field("next", "New password", "password", 'autocomplete="new-password" minleng
 <button type="button" class="btn ghost" id="sign-out">Sign out of this website</button>
 </section>
 </div>
+<script src="/otp.js"></script>
 <script src="/account.js"></script>`,
   });
 }
@@ -341,9 +341,9 @@ function adminPage() {
 <h1>Admin</h1><p id="gate-text">Loading…</p>
 <a class="btn" id="gate-account" href="/account" hidden>Go to the account page</a>
 <form id="code-form" hidden novalidate>
-<div id="by-app" hidden><label for="app-code">The 6-digit code from your authenticator app</label><input id="app-code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
+<div id="by-app" hidden><label for="app-code">The 6-digit code from your authenticator app</label><input id="app-code" data-otp inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
 <div id="by-email" hidden><button class="btn ghost" type="button" id="send-code">Email me a code</button>
-<div id="code-entry" hidden><label for="code">The 6-digit code from your email</label><input id="code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div></div>
+<div id="code-entry" hidden><label for="code">The 6-digit code from your email</label><input id="code" data-otp inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div></div>
 <label class="check" id="trust-row" hidden><input type="checkbox" id="trust"> Trust this browser for 30 days</label>
 <button class="btn" type="submit" id="open" hidden>Open the dashboard</button>
 <button type="button" class="link" id="use-email" hidden>Can’t use your authenticator? Email me a code</button>
@@ -393,9 +393,9 @@ function adminPage() {
 <li>Type the 6-digit code it shows, to confirm.</li></ol>
 <div class="qr-row"><div class="qr" id="totp-qr" role="img" aria-label="QR code for your authenticator app"></div>
 <div class="qr-side"><p class="hint">Can’t scan? Enter this key in the app instead:</p><code id="totp-secret"></code></div></div>
-<form class="form inline" id="totp-confirm" novalidate><label class="sr" for="totp-code">Code from the app</label><input id="totp-code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code"><button class="btn" type="submit">Turn on</button></form></div>
+<form class="form inline" id="totp-confirm" novalidate><label class="sr" for="totp-code">Code from the app</label><input id="totp-code" data-otp="submit" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Code from the app"><button class="btn" type="submit">Turn on</button></form></div>
 <button class="btn" type="button" id="totp-begin" hidden>Set up an authenticator app</button>
-<form class="form inline" id="totp-remove" hidden novalidate><label class="sr" for="totp-remove-code">Code from the app</label><input id="totp-remove-code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Code from the app"><button class="btn ghost danger" type="submit">Remove it</button></form>
+<form class="form inline" id="totp-remove" hidden novalidate><label class="sr" for="totp-remove-code">Code from the app</label><input id="totp-remove-code" data-otp inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Code from the app"><button class="btn ghost danger" type="submit">Remove it</button></form>
 <p class="msg" role="status" id="totp-msg"></p></div>
 <div class="card"><h2>Staying signed in</h2><p class="hint">Without “Trust this browser”, the dashboard asks again after 12 hours. Trusted browsers skip the second step for 30 days. Signing out here, or out of the account page, ends it straight away.</p></div>
 </section>
@@ -418,6 +418,7 @@ function adminPage() {
 <form class="form inline" id="d-delete" novalidate><label class="sr" for="d-confirm">Type the account’s email to confirm</label><input id="d-confirm" placeholder="Type the account’s email to confirm"><button class="btn ghost danger" type="submit">Delete</button></form></section>
 <p class="msg" role="status" id="d-msg"></p></div></dialog>
 <script src="/vendor/qrcode.js"></script>
+<script src="/otp.js"></script>
 <script src="/admin.js"></script>
 </body></html>
 `;
