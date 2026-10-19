@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@200;300;400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="/footer.css">
+<script>document.cookie.split("; ").includes("hk_signed_in=1")&&document.documentElement.classList.add("signed-in")</script>
 <style>
 /* Layout: the product told through the Bible's story. Two scenes hold the screen while they play
    (the first light, the parting sea); the rest scroll freely and reveal as they arrive. */
@@ -41,7 +42,7 @@ h1, h2, h3, p { margin: 0; }
 .top .links { display: flex; gap: 32px; font: 200 14px/1 var(--ui); color: var(--soft); }
 .top .links a { text-decoration: none; }
 .top .links a:hover { color: var(--ink); }
-.top .go { text-decoration: none; font: 700 14px/1 var(--ui); padding: 11px 16px; border-radius: 7px; color: #1d1200; background: var(--gold); white-space: nowrap; }
+.top .go { text-decoration: none; font: 600 14px/1 var(--ui); padding: 11px 16px; border-radius: 7px; color: #1d1200; background: var(--gold); white-space: nowrap; }
 .top .go:hover { background: var(--gold-pale); }
 @media (max-width: 860px) { .top { grid-template-columns: 1fr auto; } .top .links { display: none; } }
 /* On phones the links fold into a menu button. */
@@ -60,7 +61,7 @@ h1, h2, h3, p { margin: 0; }
 .links .links-go { display: none; }
 @media (max-width: 860px) {
   .top .right > .go { display: none; }
-  .top.open .links .links-go { display: block; margin-top: 6px; padding: 15px 16px; border-radius: 9px; text-align: center; font: 700 15px/1 var(--ui); color: #1d1200; background: var(--gold); }
+  .top.open .links .links-go { display: block; margin-top: 6px; padding: 15px 16px; border-radius: 9px; text-align: center; font: 600 15px/1 var(--ui); color: #1d1200; background: var(--gold); }
   .top.open .links .links-go:hover { background: var(--gold-pale); color: #1d1200; }
 }
 
@@ -70,7 +71,7 @@ h1, h2, h3, p { margin: 0; }
 .h2 { font: 400 clamp(36px, 5vw, 66px)/1.06 var(--epic); letter-spacing: .015em; text-wrap: balance; }
 .lede { font-size: 16px; font-weight: 200; color: var(--soft); max-width: 36em; }
 .lede b { color: var(--ink); font-weight: 600; }
-.btn { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font: 700 15px/1 var(--ui); padding: 15px 22px; border-radius: 8px; border: 1px solid var(--gold); color: #1d1200; background: var(--gold); white-space: nowrap; cursor: pointer; transition: background .2s, border-color .2s; }
+.btn { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font: 600 15px/1 var(--ui); padding: 15px 22px; border-radius: 8px; border: 1px solid var(--gold); color: #1d1200; background: var(--gold); white-space: nowrap; cursor: pointer; transition: background .2s, border-color .2s; }
 .btn:hover { background: var(--gold-pale); border-color: var(--gold-pale); }
 .btn.ghost { background: rgba(5,4,9,.4); color: var(--ink); border-color: rgba(244,237,225,.32); }
 .btn.ghost:hover { border-color: var(--ink); background: rgba(5,4,9,.6); }
@@ -275,7 +276,7 @@ dialog.article ol { margin: 0; padding-left: 22px; display: grid; gap: 10px; col
 dialog.article ol b { color: var(--ink); }
 dialog.article .tip { border-left: 2px solid var(--gold); padding: 4px 0 4px 14px; color: var(--soft); font-size: 15px; }
 dialog.article .close { position: sticky; top: 0; display: flex; justify-content: flex-end; padding: 12px 12px 0; background: linear-gradient(#0d0a07 70%, transparent); }
-dialog.article .close button { font: 700 13px/1 var(--ui); padding: 9px 12px; border-radius: 7px; background: rgba(255,255,255,.06); color: var(--ink); border: 1px solid rgba(255,255,255,.12); cursor: pointer; }
+dialog.article .close button { font: 600 13px/1 var(--ui); padding: 9px 12px; border-radius: 7px; background: rgba(255,255,255,.06); color: var(--ink); border: 1px solid rgba(255,255,255,.12); cursor: pointer; }
 .log { margin-top: 40px; display: grid; gap: 0; border-left: 1px solid rgba(233,178,76,.3); }
 .rel { position: relative; padding: 0 0 36px 30px; display: grid; gap: 10px; }
 .rel::before { content: ""; position: absolute; left: -6px; top: 6px; width: 11px; height: 11px; border-radius: 50%; background: #0d0a07; border: 2px solid var(--gold); }
@@ -314,8 +315,8 @@ dialog.article .close button { font: 700 13px/1 var(--ui); padding: 9px 12px; bo
     <svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="hk-gold" gradientUnits="userSpaceOnUse" x1="30" y1="6" x2="70" y2="94"><stop offset="0" stop-color="#fbe7b5"/><stop offset=".48" stop-color="#e9b24c"/><stop offset="1" stop-color="#b07a24"/></linearGradient></defs><g fill="url(#hk-gold)"><path d="M11 10H39V14.5C35 14.5 33 16.5 33 20.5V79.5C33 83.5 35 85.5 39 85.5V90H11V85.5C15 85.5 17 83.5 17 79.5V20.5C17 16.5 15 14.5 11 14.5Z"/><path d="M61 10H89V14.5C85 14.5 83 16.5 83 20.5V79.5C83 83.5 85 85.5 89 85.5V90H61V85.5C65 85.5 67 83.5 67 79.5V20.5C67 16.5 65 14.5 61 14.5Z"/><circle cx="50" cy="38.5" r="7.75"/><circle cx="50" cy="61.5" r="7.75"/></g></svg>
     HEARKEN
   </a>
-  <div class="links" id="site-links"><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="/manual">Manual</a><a href="/support">Support</a><a href="/blog">Blog</a><a href="/changelog">Changelog</a><a href="/account">Account</a><a class="links-go" href="#download">Start free trial</a></div>
-  <div class="right"><a class="go" href="#download">Start free trial</a><button class="menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-links"><span></span><span></span><span></span></button></div>
+  <div class="links" id="site-links"><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="/manual">Manual</a><a href="/support">Support</a><a href="/blog">Blog</a><a href="/changelog">Changelog</a><a class="links-acct" href="/account"><span data-when="out">Sign in</span><span data-when="in">My account</span></a><a class="links-go" href="#download">Download</a></div>
+  <div class="right"><a class="acct" href="/account"><span data-when="out">Sign in</span><span data-when="in">My account</span></a><a class="go" href="#download">Download</a><button class="menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-links"><span></span><span></span><span></span></button></div>
 </nav>
 <script>
 // The phone menu: the button opens the links; a link, Esc or a tap elsewhere closes them.
@@ -339,7 +340,7 @@ dialog.article .close button { font: 700 13px/1 var(--ui); padding: 9px 12px; bo
       <div class="reveal step" data-at=".55">
         <h1>Say the verse. See the verse.</h1>
         <p class="tag">Hearken Studio listens to the sermon and puts every scripture on screen in about half a second.</p>
-        <div class="ctas"><a class="btn" href="#download">Start free trial</a><a class="btn ghost" href="#listen">Begin the journey</a></div>
+        <div class="ctas"><a class="btn" href="#download">Download</a><a class="btn ghost" href="#listen">Begin the journey</a></div>
       </div>
       <p class="cue step on" data-at="0">Scroll</p>
     </div></div>
@@ -612,7 +613,7 @@ dialog.article .close button { font: 700 13px/1 var(--ui); padding: 9px 12px; bo
       <h2 class="h2 rv d1" style="margin-top:18px">Two months free. Every feature.</h2>
       <p class="lede rv d2" style="margin-top:18px">Try all of it at your own services for two months before you decide. No minutes to count, and nothing held back.</p>
       <div class="plan rv">
-        <div class="price"><p class="eyebrow">Free trial</p><p class="amt">$0</p><p class="per">For your first two months. No card needed.<br>Paid plans will be announced before your trial ends.</p><a class="btn" href="#download" style="justify-self:start">Start free trial</a></div>
+        <div class="price"><p class="eyebrow">Free trial</p><p class="amt">$0</p><p class="per">For your first two months. No card needed.<br>Paid plans will be announced before your trial ends.</p><a class="btn" href="#download" style="justify-self:start">Download</a></div>
         <ul class="incl">
           <li>Unlimited listening</li><li>Announced, quoted and paraphrased verses</li>
           <li>Follow-along reading</li><li>Worship lyrics and CCLI report</li>

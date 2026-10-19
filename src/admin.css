@@ -15,14 +15,14 @@ h1, h2, h3, p { margin: 0; }
 .msg { min-height: 1.4em; color: var(--gold-pale); font-size: 14px; }
 
 /* Buttons and fields */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: 700 14px/1 var(--ui); padding: 11px 16px; border-radius: 8px; border: 1px solid var(--gold); background: var(--gold); color: #1d1200; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: 600 14px/1 var(--ui); padding: 11px 16px; border-radius: 8px; border: 1px solid var(--gold); background: var(--gold); color: #1d1200; cursor: pointer; text-decoration: none; white-space: nowrap; }
 .btn:hover { background: var(--gold-pale); border-color: var(--gold-pale); }
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); }
 .btn.ghost:hover { border-color: var(--gold); }
 .btn.small { padding: 8px 12px; font-size: 13px; }
 .btn.danger, .link.danger { color: var(--red); }
 .btn.ghost.danger { border-color: rgba(255,138,138,.45); }
-.link { background: none; border: 0; padding: 0; font: 600 14px/1.4 var(--ui); color: var(--gold-pale); cursor: pointer; text-align: left; }
+.link { background: none; border: 0; padding: 0; font: 500 14px/1.4 var(--ui); color: var(--gold-pale); cursor: pointer; text-align: left; }
 input, select { font: 400 15px/1 var(--ui); color: var(--ink); background: var(--raised); border: 1px solid var(--line-strong); border-radius: 8px; padding: 11px 13px; width: 100%; }
 input:focus, select:focus { outline: none; border-color: var(--gold); }
 label { font: 600 13.5px/1.2 var(--ui); color: var(--ink); }
@@ -53,7 +53,7 @@ label { font: 600 13.5px/1.2 var(--ui); color: var(--ink); }
 .side-foot .me { color: var(--dim); overflow-wrap: anywhere; }
 .side-foot a { color: var(--soft); text-decoration: none; }
 .side-foot a:hover { color: var(--ink); }
-.side-foot button { justify-self: start; background: none; border: 0; padding: 0; font: 600 13px/1.4 var(--ui); color: var(--gold-pale); cursor: pointer; }
+.side-foot button { justify-self: start; background: none; border: 0; padding: 0; font: 500 13px/1.4 var(--ui); color: var(--gold-pale); cursor: pointer; }
 .main { min-width: 0; display: flex; flex-direction: column; }
 .topbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 16px clamp(16px, 3vw, 32px); background: rgba(7,5,12,.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
 .topbar h1 { font: 700 20px/1.2 var(--ui); }
@@ -90,7 +90,7 @@ a.tile:hover { border-color: rgba(233,178,76,.4); }
 .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .search { width: min(360px, 100%); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chips button { font: 600 13px/1 var(--ui); padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line-strong); background: transparent; color: var(--soft); cursor: pointer; }
+.chips button { font: 500 13px/1 var(--ui); padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line-strong); background: transparent; color: var(--soft); cursor: pointer; }
 .chips button[aria-pressed="true"] { background: rgba(233,178,76,.14); border-color: rgba(233,178,76,.5); color: var(--gold-pale); }
 .chips button small { color: var(--dim); margin-left: 4px; }
 .table { overflow-x: auto; }

@@ -44,8 +44,7 @@ const browser = (store) => {
     const res = reply();
     const cookie = Object.entries(jar).map(([k, v]) => `${k}=${v}`).join("; ");
     await fn({ method, body, headers: { host: "hearken.test", origin, cookie } }, res, store);
-    const set = res.headers["Set-Cookie"];
-    if (set) {
+    for (const set of [res.headers["Set-Cookie"] ?? []].flat()) {
       const [k, v] = set.split(";")[0].split("=");
       v ? (jar[k] = v) : delete jar[k];
     }
@@ -100,7 +99,7 @@ test("getting in takes an admin email and the emailed code", async () => {
   assert.equal((await b.admin("GET")).code, 401, "not in yet");
   const ok = await b.admin("POST", { action: "verify", code });
   assert.equal(ok.code, 200);
-  assert.match(ok.headers["Set-Cookie"], /^hk_admin=.*SameSite=Strict/);
+  assert.match([ok.headers["Set-Cookie"]].flat()[0], /^hk_admin=.*SameSite=Strict/);
   assert.equal((await b.admin("POST", { action: "verify", code })).code, 400, "a code works once");
   assert.equal((await b.admin("GET")).code, 200);
   assert.equal((await b.admin("POST", { action: "account", email: church.email }, "https://evil.example")).code, 403);
@@ -211,7 +210,7 @@ test("an authenticator app replaces the emailed code, and a browser can be trust
   assert.equal((await other.admin("POST", { action: "verify", method: "app", code: codeAt(secret, step) })).code, 400, "a code works once");
   const signedIn = await other.admin("POST", { action: "verify", method: "app", code: codeAt(secret, step + 1), trust: true });
   assert.equal(signedIn.code, 200);
-  assert.match(signedIn.headers["Set-Cookie"], /Max-Age=2592000/, "trusted for 30 days");
+  assert.match([signedIn.headers["Set-Cookie"]].flat()[0], /^hk_admin=.*Max-Age=2592000/, "trusted for 30 days");
   assert.equal(sent.length, 0, "no email needed");
 
   // The emailed code still works as a fallback, for 12 hours.
@@ -219,7 +218,7 @@ test("an authenticator app replaces the emailed code, and a browser can be trust
   await third.account("POST", { action: "login", email: ADMIN.email, password: ADMIN.password });
   await third.admin("POST", { action: "code" });
   const fallback = await third.admin("POST", { action: "verify", method: "email", code: sent.at(-1).data.code });
-  assert.match(fallback.headers["Set-Cookie"], /Max-Age=43200/);
+  assert.match([fallback.headers["Set-Cookie"]].flat()[0], /^hk_admin=.*Max-Age=43200/);
 
   // Removing it needs a current code, one not used yet: a minute later, the app shows a new one.
   assert.equal((await other.admin("POST", { action: "totpRemove", code: "123" })).code, 400);

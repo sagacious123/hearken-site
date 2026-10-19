@@ -126,7 +126,7 @@ function footer() {
 </div>
 ${col("Product", [["Features", "/#features"], ["Pricing", "/#pricing"], ["Download", "/#download"], ["Changelog", "/changelog"]])}
 ${col("Help", [["User manual", "/manual"], ["Guides", "/blog"], ["Support", "/support"], ["Privacy", "/manual#data"]])}
-${col("Account", [["Sign in", "/account"], ["Create an account", "/account#create"], ["Reset your password", "/account#forgot"]])}
+<nav aria-label="Account"><h2>Account</h2><ul><li data-when="out"><a href="/account">Sign in</a></li><li data-when="out"><a href="/account#create">Create an account</a></li><li data-when="in"><a href="/account">My account</a></li></ul></nav>
 </div>
 <div class="foot-base"><span>© ${new Date().getFullYear()} Hearken Studio</span><span>Works offline on Mac, Windows and Linux</span><a href="${GH}">GitHub</a></div>
 </footer>`;
@@ -139,7 +139,6 @@ const NAV = [
   ["Support", "/support"],
   ["Blog", "/blog"],
   ["Changelog", "/changelog"],
-  ["Account", "/account"],
 ];
 
 function page({ title, current, description, body, head = "" }) {
@@ -151,9 +150,10 @@ function page({ title, current, description, body, head = "" }) {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;1,400&family=Manrope:wght@200;300;400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="/site.css"><link rel="stylesheet" href="/footer.css">${head}</head>
+<link rel="stylesheet" href="/site.css"><link rel="stylesheet" href="/footer.css">${head}
+<script>document.cookie.split("; ").includes("hk_signed_in=1")&&document.documentElement.classList.add("signed-in")</script></head>
 <body>
-<nav class="top" aria-label="Main"><a class="brand" href="/">${LOGO}HEARKEN</a><div class="links" id="site-links">${links}<a class="links-go" href="/#download">Start free trial</a></div><div class="right"><a class="go" href="/#download">Start free trial</a><button class="menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-links"><span></span><span></span><span></span></button></div></nav>
+<nav class="top" aria-label="Main"><a class="brand" href="/">${LOGO}HEARKEN</a><div class="links" id="site-links">${links}<a class="links-acct" href="/account"><span data-when="out">Sign in</span><span data-when="in">My account</span></a><a class="links-go" href="/#download">Download</a></div><div class="right"><a class="acct" href="/account"><span data-when="out">Sign in</span><span data-when="in">My account</span></a><a class="go" href="/#download">Download</a><button class="menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-links"><span></span><span></span><span></span></button></div></nav>
 <main>${body}</main>
 ${footer()}
 <script>

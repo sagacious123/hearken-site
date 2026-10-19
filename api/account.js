@@ -20,7 +20,7 @@ import {
 } from "../lib/auth.js";
 import { kv } from "../lib/kv.js";
 import { now } from "../lib/pass.js";
-import { ACCOUNT, sameSite, setCookie, signedIn as webSignedIn, startSignIn } from "../lib/web.js";
+import { ACCOUNT, HINT, readCookie, sameSite, setCookie, setHint, signedIn as webSignedIn, startSignIn } from "../lib/web.js";
 
 const signedIn = (req, store) => webSignedIn(req, store, ACCOUNT.name, ACCOUNT.prefix);
 const startWeb = (res, store, user) => startSignIn(res, store, user, ACCOUNT);
@@ -30,7 +30,10 @@ export default async function handler(req, res, store = kv) {
   try {
     if (req.method === "GET") {
       const me = await signedIn(req, store);
-      return me ? res.status(200).json(await summary(store, me.user)) : fail(res, 401, "Signed out");
+      if (me) return res.status(200).json(await summary(store, me.user));
+      // Signed out (or the sign-in ended): the menu should say "Sign in" again.
+      if (readCookie(req, HINT)) setHint(res, false);
+      return fail(res, 401, "Signed out");
     }
     if (req.method !== "POST") return fail(res, 405, "GET or POST only");
     if (!sameSite(req)) return fail(res, 403, "bad request");
@@ -64,6 +67,7 @@ export default async function handler(req, res, store = kv) {
     if (b.action === "logout") {
       if (me) await store(["DEL", `web:${sha256(me.token)}`]);
       setCookie(res, ACCOUNT.name, "", 0);
+      setHint(res, false);
       return res.status(200).json({ ok: true });
     }
     if (!me) return fail(res, 401, "Your sign-in has ended. Sign in again.");

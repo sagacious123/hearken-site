@@ -6,7 +6,7 @@
 .foot-logo { display: inline-flex; align-items: center; gap: 10px; justify-self: start; text-decoration: none; color: #f4ede1; font: 600 18px/1 "Cinzel", "Times New Roman", serif; letter-spacing: .14em; }
 .foot-logo svg { width: 26px; height: 26px; }
 .foot-brand p { margin: 0; color: #a99f8f; }
-.foot-cta { justify-self: start; display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(233,178,76,.5); color: #f8e0a4; font: 700 13.5px/1 "Manrope", system-ui, sans-serif; text-decoration: none; transition: background .2s, border-color .2s; }
+.foot-cta { justify-self: start; display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(233,178,76,.5); color: #f8e0a4; font: 600 13.5px/1 "Manrope", system-ui, sans-serif; text-decoration: none; transition: background .2s, border-color .2s; }
 .foot-cta:hover { background: rgba(233,178,76,.1); border-color: #e9b24c; }
 .site-foot nav h2 { margin: 0 0 14px; font: 600 12px/1 "Cinzel", "Times New Roman", serif; letter-spacing: .24em; text-transform: uppercase; color: #e9b24c; }
 .site-foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
@@ -22,4 +22,17 @@
 @media (max-width: 420px) {
   .foot-base { padding-bottom: 48px; }
   .foot-base a { margin-left: 0; }
+}
+
+/* Signed in or not (the hk_signed_in hint, read in each page's head): "Sign in" or "My account". */
+html:not(.signed-in) [data-when="in"], html.signed-in [data-when="out"] { display: none !important; }
+
+/* The account button beside Download in the menu bar, and its place in the phone menu. */
+.top .acct { display: inline-flex; align-items: center; text-decoration: none; font: 500 14px/1 "Manrope", system-ui, sans-serif; padding: 10px 15px; border-radius: 7px; color: #f4ede1; border: 1px solid rgba(244,237,225,.28); white-space: nowrap; transition: border-color .2s, background .2s; }
+.top .acct:hover { border-color: #e9b24c; background: rgba(233,178,76,.08); }
+.links .links-acct { display: none; }
+@media (max-width: 860px) {
+  .top .right > .acct { display: none; }
+  .top.open .links .links-acct { display: block; margin-top: 8px; padding: 15px 16px; border-radius: 9px; text-align: center; font: 500 15px/1 "Manrope", system-ui, sans-serif; color: #f4ede1; border: 1px solid rgba(244,237,225,.28); background: transparent; }
+  .top.open .links .links-acct + .links-go { margin-top: 8px; }
 }

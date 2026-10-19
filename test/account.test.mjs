@@ -42,7 +42,7 @@ const web = async (store, cookie, method, body, origin = "https://hearken.test")
   await account({ method, body, headers: { host: "hearken.test", origin, cookie: cookie ?? "" } }, res, store);
   return res;
 };
-const cookieOf = (res) => res.headers["Set-Cookie"]?.split(";")[0];
+const cookieOf = (res) => [res.headers["Set-Cookie"] ?? []].flat().find((c) => c.startsWith("hk_account="))?.split(";")[0];
 /** The code in the last email sent to `to`. */
 const codeFor = (to) => sent.filter((m) => m.to === to).at(-1)?.data.code;
 /** Signs up on the website: details, then the emailed code. */
@@ -104,7 +104,9 @@ test("the account page signs in with a cookie and manages computers", async () =
   assert.equal((await web(store, null, "POST", { action: "login", email: owner.email, password: "wrong-one" })).code, 401);
   const login = await web(store, null, "POST", { action: "login", email: "Media@Grace.org", password: owner.password });
   assert.equal(login.code, 200);
-  assert.match(login.headers["Set-Cookie"], /HttpOnly; Secure; SameSite=Lax/);
+  const [session, hint] = login.headers["Set-Cookie"];
+  assert.match(session, /^hk_account=.*HttpOnly; Secure; SameSite=Lax/);
+  assert.match(hint, /^hk_signed_in=1; Path=\/; Secure; SameSite=Lax; Max-Age=2592000$/, "a readable hint, no HttpOnly, nothing secret");
   const cookie = cookieOf(login);
 
   const me = await web(store, cookie, "GET");
@@ -127,7 +129,9 @@ test("the account page signs in with a cookie and manages computers", async () =
   assert.equal((await web(store, cookie, "POST", { action: "password", current: owner.password, password: "new password" })).code, 200);
   assert.equal((await call("login", { ...owner, password: "new password", machine: machines[1] }, store)).code, 200);
 
-  assert.equal((await web(store, cookie, "POST", { action: "logout" })).code, 200);
+  const out = await web(store, cookie, "POST", { action: "logout" });
+  assert.equal(out.code, 200);
+  assert.ok(out.headers["Set-Cookie"].some((c) => c.startsWith("hk_signed_in=;") && c.includes("Max-Age=0")), "the hint goes on signing out");
   assert.equal((await web(store, cookie, "GET")).code, 401);
 });
 

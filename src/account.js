@@ -159,6 +159,7 @@
 
   function show(a) {
     $("loading").hidden = true;
+    document.documentElement.classList.toggle("signed-in", !!a);
     $("in").hidden = !a;
     $("out").hidden = !!a;
     if (a) render(a);
