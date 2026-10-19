@@ -110,6 +110,9 @@ test("the account page signs in with a cookie and manages computers", async () =
   const cookie = cookieOf(login);
 
   const me = await web(store, cookie, "GET");
+  assert.match([me.headers["Set-Cookie"]].flat()[0] ?? "", /^hk_signed_in=1;/, "a sign-in without the hint gets it back");
+  const again = await web(store, `${cookie}; hk_signed_in=1`, "GET");
+  assert.equal(again.headers["Set-Cookie"], undefined, "and isn't sent it twice");
   assert.equal(me.body.church, "Grace Chapel");
   assert.equal(me.body.limit, 3);
   assert.equal(me.body.computers[0].name, "Media desk");

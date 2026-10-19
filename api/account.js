@@ -30,7 +30,11 @@ export default async function handler(req, res, store = kv) {
   try {
     if (req.method === "GET") {
       const me = await signedIn(req, store);
-      if (me) return res.status(200).json(await summary(store, me.user));
+      if (me) {
+        // Signed in before the menu's hint existed (or it was cleared): set it again.
+        if (!readCookie(req, HINT)) setHint(res, true, ACCOUNT.seconds);
+        return res.status(200).json(await summary(store, me.user));
+      }
       // Signed out (or the sign-in ended): the menu should say "Sign in" again.
       if (readCookie(req, HINT)) setHint(res, false);
       return fail(res, 401, "Signed out");
